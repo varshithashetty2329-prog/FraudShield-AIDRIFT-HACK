@@ -382,6 +382,24 @@ export default function App() {
     }
   };
 
+  const handleDeleteScan = async (scanId) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/scans/${scanId}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        alert(lang === 'en' ? "Scan deleted" : "ತಪಾಸಣೆಯನ್ನು ಅಳಿಸಲಾಗಿದೆ");
+        fetchRecentScans(user?.id);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete scan");
+      }
+    } catch (err) {
+      console.error("Error deleting scan:", err);
+      alert("Error deleting scan");
+    }
+  };
+
   const fetchTodayReportsCount = async () => {
     try {
       const res = await fetch('http://localhost:5000/api/reports/today-count');
@@ -2828,9 +2846,18 @@ export default function App() {
                           </span>
                         </div>
                         
-                        <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${badgeColor}`}>
-                          {scan.result.toUpperCase()}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${badgeColor}`}>
+                            {scan.result.toUpperCase()}
+                          </span>
+                          <button
+                            onClick={() => handleDeleteScan(scan.id)}
+                            title={lang === 'en' ? "Delete Scan" : "ತಪಾಸಣೆ ಅಳಿಸಿ"}
+                            className="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 p-1.5 rounded-full transition-all cursor-pointer"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                          </button>
+                        </div>
                       </div>
 
                       <div className="bg-slate-50 rounded-xl p-2.5 text-slate-700 font-extrabold text-xs sm:text-sm break-all border border-slate-100 select-all">

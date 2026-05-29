@@ -1101,6 +1101,19 @@ def get_recent_scans():
         print(f"Error fetching scans from database: {ex}")
         return jsonify([])
 
+@app.route("/api/scans/<int:scan_id>", methods=["DELETE"])
+def delete_scan(scan_id):
+    try:
+        scan = ScanHistory.query.get(scan_id)
+        if not scan:
+            return jsonify({"error": "Scan not found"}), 404
+        db.session.delete(scan)
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as ex:
+        print(f"Error deleting scan from database: {ex}")
+        return jsonify({"success": False, "error": str(ex)}), 500
+
 
 
 @app.route("/api/reports/today-count", methods=["GET"])
