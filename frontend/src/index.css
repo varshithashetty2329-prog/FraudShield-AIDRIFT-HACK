@@ -95,3 +95,87 @@
   animation: laser-sweep 3s infinite ease-in-out;
 }
 
+/* Dark Theme Global Overrides */
+.dark-theme-styles {
+  background-color: #030712 !important; /* dark slate bg */
+  color: #f3f4f6 !important;
+}
+
+.dark-theme-styles .bg-white {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+.dark-theme-styles .text-slate-800,
+.dark-theme-styles .text-slate-700,
+.dark-theme-styles .text-slate-900,
+.dark-theme-styles .text-emerald-950,
+.dark-theme-styles .text-slate-600 {
+  color: #e5e7eb !important;
+}
+
+.dark-theme-styles .text-emerald-800,
+.dark-theme-styles .text-emerald-900 {
+  color: #a7f3d0 !important;
+}
+
+.dark-theme-styles .bg-slate-100 {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+.dark-theme-styles .bg-slate-50 {
+  background-color: #111827 !important;
+}
+
+.dark-theme-styles .bg-emerald-50 {
+  background-color: #064e3b !important; /* deep emerald bg */
+  color: #ecfdf5 !important;
+  border-color: #047857 !important;
+}
+
+.dark-theme-styles .gauge-cover {
+  background: #1f2937 !important;
+}
+
+.dark-theme-styles .gauge-cover span {
+  color: #f3f4f6 !important;
+}
+
+/* Large Text Mode CSS scaling (20% increase) */
+.large-text-styles {
+  font-size: 1.2rem !important;
+}
+
+.large-text-styles h1 {
+  font-size: 2.4rem !important;
+}
+
+.large-text-styles h2 {
+  font-size: 1.8rem !important;
+}
+
+.large-text-styles h3 {
+  font-size: 1.55rem !important;
+}
+
+.large-text-styles h4 {
+  font-size: 1.35rem !important;
+}
+
+.large-text-styles h5 {
+  font-size: 1.25rem !important;
+}
+
+.large-text-styles p,
+.large-text-styles span,
+.large-text-styles button,
+.large-text-styles label,
+.large-text-styles input,
+.large-text-styles a,
+.large-text-styles li {
+  font-size: 1.2rem !important;
+  line-height: 1.65 !important;
+}
+

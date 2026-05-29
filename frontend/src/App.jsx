@@ -104,6 +104,16 @@ const TRANSLATIONS = {
       payTriggered: "Redirecting safely to [App]... Verify payee details before entering your PIN!",
       orText: "OR"
     },
+    emergency: {
+      title: "🚨 EMERGENCY ACTIONS (Rural Safety Helpline)",
+      blockBtn: "🛑 BLOCK PAYMENT",
+      blockDesc: "Close your payment app immediately",
+      reportBtn: "🚨 REPORT FRAUD",
+      reportDesc: "Report this fraud to Indian Cyber Crime portal",
+      callBtn: "📞 CALL 1930",
+      callDesc: "National Cyber Helpline (1930)",
+      callSub: "Free helpline, available 24/7"
+    },
     auth: {
       loginTitle: "Enter FraudShield 🛡️",
       loginSubtitle: "Sign in to your account for safe transactions",
@@ -225,6 +235,16 @@ const TRANSLATIONS = {
       payTriggered: "ಅಧಿಕೃತ [App] ಆ್ಯಪ್‌ಗೆ ಸುರಕ್ಷಿತವಾಗಿ ಮರುನಿರ್ದೇಶಿಸಲಾಗುತ್ತಿದೆ... ಪಿನ್ ದಾಖಲಿಸುವ ಮುನ್ನ ಹೆಸರು ಪರಿಶೀಲಿಸಿ!",
       orText: "ಅಥವಾ"
     },
+    emergency: {
+      title: "🚨 ತುರ್ತು ಕ್ರಮಗಳು (ಗ್ರಾಮೀಣ ರಕ್ಷಣಾ ಸಹಾಯವಾಣಿ)",
+      blockBtn: "🛑 ಪಾವತಿ ತಡೆಯಿರಿ",
+      blockDesc: "ನಿಮ್ಮ ಪಾವತಿ ಆಪ್ ಅನ್ನು ತಕ್ಷಣವೇ ಮುಚ್ಚಿ",
+      reportBtn: "🚨 ವಂಚನೆ ವರದಿ ಮಾಡಿ",
+      reportDesc: "ಈ ವಂಚನೆಯನ್ನು ಭಾರತೀಯ ಸೈಬರ್ ಕ್ರೈಮ್ ಪೋರ್ಟಲ್‌ಗೆ ವರದಿ ಮಾಡಿ",
+      callBtn: "📞 1930 ಗೆ ಕರೆ ಮಾಡಿ",
+      callDesc: "ರಾಷ್ಟ್ರೀಯ ಸೈಬರ್ ಸಹಾಯವಾಣಿ (1930)",
+      callSub: "ಉಚಿತ ಸಹಾಯವಾಣಿ, ದಿನದ 24 ಗಂಟೆಯೂ ಲಭ್ಯ"
+    },
     auth: {
       loginTitle: "ಫ್ರಾಡ್‌ಶೀಲ್ಡ್ ಒಳಗೆ ಪ್ರವೇಶಿಸಿ 🛡️",
       loginSubtitle: "ಸುರಕ್ಷಿತ ವಹಿವಾಟುಗಳಿಗಾಗಿ ನಿಮ್ಮ ಖಾತೆಗೆ ಲಾಗಿನ್ ಮಾಡಿ",
@@ -263,6 +283,28 @@ const TRANSLATIONS = {
 export default function App() {
   const [lang, setLang] = useState('en'); 
   const [activeTab, setActiveTab] = useState('upi'); 
+  
+  // Accessibility States
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('fraudshield_dark_mode') === 'true';
+  });
+  const [largeText, setLargeText] = useState(() => {
+    return localStorage.getItem('fraudshield_large_text') === 'true';
+  });
+
+  const toggleDarkMode = () => {
+    setDarkMode(prev => {
+      localStorage.setItem('fraudshield_dark_mode', !prev);
+      return !prev;
+    });
+  };
+
+  const toggleLargeText = () => {
+    setLargeText(prev => {
+      localStorage.setItem('fraudshield_large_text', !prev);
+      return !prev;
+    });
+  }; 
   
   // Authentication states
   const [user, setUser] = useState(() => {
@@ -693,6 +735,75 @@ export default function App() {
     window.speechSynthesis.speak(utterance);
   };
 
+  const getSteps = (result) => {
+    if (!result) return [];
+    return lang === 'en'
+      ? (result.steps_en || [
+          "1. Do NOT click any links or scan this QR again.",
+          "2. Delete the sender's message and block them immediately.",
+          "3. Warn family members not to trust this scheme."
+        ])
+      : (result.steps_kn || [
+          "1. ಯಾವುದೇ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಬೇಡಿ ಅಥವಾ ಕ್ಯೂಆರ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಬೇಡಿ.",
+          "2. ಕಳುಹಿಸಿದವರ ಸಂದೇಶವನ್ನು ಅಳಿಸಿ ತಕ್ಷಣವೇ ಬ್ಲಾಕ್ ಮಾಡಿ.",
+          "3. ಈ ಸುಳ್ಳು ಯೋಜನೆಯನ್ನು ನಂಬದಂತೆ ಕುಟುಂಬದವರಿಗೆ ಎಚ್ಚರಿಸಿ."
+        ]);
+  };
+
+  const getActiveResult = () => {
+    switch (activeTab) {
+      case 'upi':
+        return { result: upiResult, type: 'upi', steps: getSteps(upiResult) };
+      case 'qr':
+        return { result: qrResult, type: 'qr', steps: getSteps(qrResult) };
+      case 'phishing':
+        return { result: messageResult, type: 'phishing', steps: getSteps(messageResult) };
+      case 'otp':
+        return { result: otpResult, type: 'otp', steps: getSteps(otpResult) };
+      case 'loan':
+        return { result: loanResult, type: 'loan', steps: getSteps(loanResult) };
+      default:
+        return null;
+    }
+  };
+
+  const handleHeaderTTS = () => {
+    if (isPlayingAudio) {
+      stopAudio();
+      return;
+    }
+    const active = getActiveResult();
+    if (!active || !active.result) {
+      const welcomeText = lang === 'en'
+        ? "Welcome to FraudShield. Please check a UPI ID, WhatsApp message, or QR code to verify safety first."
+        : "ಫ್ರಾಡ್‌ಶೀಲ್ಡ್‌ಗೆ ಸ್ವಾಗತ. ದಯವಿಟ್ಟು ಸುರಕ್ಷತೆಯನ್ನು ಪರಿಶೀಲಿಸಲು ಯುಪಿಐ ಐಡಿ ಅಥವಾ ಕ್ಯೂಆರ್ ಕೋಡ್ ಅನ್ನು ಮೊದಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.";
+      playTTS(welcomeText, lang);
+      return;
+    }
+    
+    const { result, type, steps } = active;
+    let speechText = lang === 'en'
+      ? `${result.message_en}. reasons. ${(result.details_en || []).join('. ')}`
+      : `${result.message_kn}. ಕಾರಣಗಳು. ${(result.details_kn || []).join('. ')}`;
+    
+    if (result.status === 'danger') {
+      const safetyStepsSpeech = lang === 'en'
+        ? `. Recovery action steps: ${steps.join('. ')}`
+        : `. ತಕ್ಷಣ ನೀವು ಮಾಡಬೇಕಾದ ೩ ಕೆಲಸಗಳು: ${steps.join('. ')}`;
+      speechText += safetyStepsSpeech;
+    }
+    
+    if (type === 'loan' && (lang === 'en' ? result.alternatives_en : result.alternatives_kn)) {
+      const alts = lang === 'en' ? result.alternatives_en : result.alternatives_kn;
+      const alternativesSpeech = lang === 'en'
+        ? `. Safer official alternatives: ${alts.join('. ')}`
+        : `. ಸುರಕ್ಷಿತ ಅಧಿಕೃತ ಪರ್ಯಾಯಗಳು: ${alts.join('. ')}`;
+      speechText += alternativesSpeech;
+    }
+
+    playTTS(speechText, lang);
+  };
+
   // -------------------------------------------------------------
   // Dynamic Rule-Based Local Fallback Logic (Identical to Backend)
   // -------------------------------------------------------------
@@ -781,50 +892,155 @@ export default function App() {
   };
 
   const getLocalQrAnalysis = (qr) => {
-    const q = qr.trim().toLowerCase();
-    if (q.startsWith("upi://pay")) {
-      const paMatch = q.match(/pa=([^&]+)/);
+    const q = qr.trim();
+    const q_lower = q.toLowerCase();
+    
+    // 1. Check if UPI payment link
+    if (q_lower.startsWith("upi://pay")) {
+      const paMatch = q.match(/pa=([^&]+)/i);
       const pa = paMatch ? paMatch[1] : "";
       return getLocalUpiAnalysis(pa);
+    } else if (q_lower.includes("@") && !q_lower.includes(" ") && !q_lower.startsWith("http")) {
+      return getLocalUpiAnalysis(q);
     }
-    if (q.includes("pmkisan") || q.includes("awas") || q.includes("relief")) {
+
+    // 2. Check if phone number
+    const phoneClean = q_lower.replace("tel:", "").replace("+91", "").replace(/ /g, "").trim();
+    const isPhone = /^\+?(91)?[6-9]\d{9}$/.test(phoneClean) || /^\d{10}$/.test(phoneClean);
+    if (isPhone && phoneClean.length >= 10 && phoneClean.length <= 12) {
       return {
-        score: 96,
-        status: "danger",
-        category_en: "Phishing QR Link",
-        category_kn: "ನಕಲಿ ಜಾಲತಾಣ ಲಿಂಕ್ ಕ್ಯೂಆರ್",
-        message_en: "CRITICAL DANGER: Fraudulent QR Web Link Detected!",
-        message_kn: "ತೀವ್ರ ಅಪಾಯ: ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ವಂಚನೆಯ ವೆಬ್ ಲಿಂಕ್ ಪತ್ತೆಯಾಗಿದೆ!",
+        score: 45,
+        status: "caution",
+        category_en: "Personal Phone Transfer Link",
+        category_kn: "ವೈಯಕ್ತಿಕ ಫೋನ್ ಸಂಖ್ಯೆ ಕ್ಯೂಆರ್",
+        message_en: `CAUTION: Phone Number detected in QR Code (${phoneClean}).`,
+        message_kn: `ಎಚ್ಚರಿಕೆ: ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ಫೋನ್ ಸಂಖ್ಯೆ ಪತ್ತೆಯಾಗಿದೆ (${phoneClean}).`,
         details_en: [
-          "This QR code encodes a web address designed to mimic official government portals.",
-          "Scanning it opens a website that will ask you to login using your bank details or pay processing fees."
+          "This QR encodes a direct mobile transfer phone number.",
+          "Anyone can generate a QR code with a phone number; it does not guarantee a safe business or utility identity.",
+          "ALWAYS call the person to verify their voice and identity before sending any money. Do not pay if you received this QR from an unknown contact."
         ],
         details_kn: [
-          "ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಅಧಿಕೃತ ಸರ್ಕಾರಿ ವೆಬ್‌ಸೈಟ್‌ಗಳಂತೆ ನಕಲು ಮಾಡುವ ಜಾಲತಾಣ ಲಿಂಕ್ ಅನ್ನು ಹೊಂದಿದೆ.",
-          "ಇದನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದರಿಂದ ತೆರೆದುಕೊಳ್ಳುವ ವೆಬ್‌ಸೈಟ್ ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ವಿವರಗಳು ಅಥವಾ ಶುಲ್ಕಗಳನ್ನು ಕೇಳುತ್ತದೆ."
-        ],
-        steps_en: [
-          "1. Do NOT click or open the link on your phone.",
-          "2. Delete the QR code image immediately.",
-          "3. Warn others in your family not to scan this printed image."
-        ],
-        steps_kn: [
-          "1. ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಈ ಲಿಂಕ್ ಅನ್ನು ಓಪನ್ ಮಾಡಬೇಡಿ.",
-          "2. ತಕ್ಷಣವೇ ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಚಿತ್ರವನ್ನು ಅಳಿಸಿಹಾಕಿ.",
-          "3. ಈ ಮುದ್ರಿತ ಚಿತ್ರವನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡದಂತೆ ನಿಮ್ಮ ಮನೆಯ ಇತರರಿಗೂ ತಿಳಿಸಿ."
+          "ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ನೇರ ಮೊಬೈಲ್ ಹಣ ವರ್ಗಾವಣೆಯ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ಹೊಂದಿದೆ.",
+          "ಯಾರು ಬೇಕಾದರೂ ಫೋನ್ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಕ್ಯೂಆರ್ ಕೋಡ್ ರಚಿಸಬಹುದು; ಇದು ಅವರ ಅಧಿಕೃತತೆಯನ್ನು ಸಾಬೀತುಪಡಿಸುವುದಿಲ್ಲ.",
+          "ಹಣ ಕಳುಹಿಸುವ ಮೊದಲು ವ್ಯಕ್ತಿಗೆ ಕರೆ ಮಾಡಿ ಅವರ ಧ್ವನಿ ಮತ್ತು ಗುರುತನ್ನು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ. ಅಪರಿಚಿತರಿಂದ ಕ್ಯೂಆರ್ ಬಂದಿದ್ದರೆ ಹಣ ವರ್ಗಾಯಿಸಬೇಡಿ."
         ]
       };
     }
+
+    // 3. Check if web link
+    const isUrl = (
+      q_lower.startsWith("http://") || 
+      q_lower.startsWith("https://") || 
+      [".com", ".info", ".in", ".org", ".net", ".xyz", ".club"].some(ext => q_lower.includes(ext)) ||
+      /[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(q_lower)
+    );
+    if (isUrl) {
+      let domain = q;
+      const urlMatch = q.match(/https?:\/\/(?:www\.)?([^/]+)/i);
+      if (urlMatch) {
+        domain = urlMatch[1];
+      }
+
+      const suspiciousKeywords = ["kyc", "update", "verify", "free", "prize", "lucky", "gift", "pmkisan", "awas", "yojana", "lottery", "win", "reward", "cashback"];
+      const foundKeywords = suspiciousKeywords.filter(kw => q_lower.includes(kw));
+
+      if (q_lower.includes("pmkisan") || q_lower.includes("awas") || q_lower.includes("yojana")) {
+        return {
+          score: 96,
+          status: "danger",
+          category_en: "Phishing QR Link",
+          category_kn: "ನಕಲಿ ಜಾಲತಾಣ ಲಿಂಕ್ ಕ್ಯೂಆರ್",
+          message_en: "CRITICAL DANGER: Fraudulent Government Scheme Phishing Link Detected!",
+          message_kn: "ತೀವ್ರ ಅಪಾಯ: ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ವಂಚನೆಯ ವೆಬ್ ಲಿಂಕ್ ಪತ್ತೆಯಾಗಿದೆ!",
+          details_en: [
+            `The QR link encodes a web address '${domain}' designed to impersonate official government schemes.`,
+            "Scanning it will redirect you to a fake site asking for your bank credentials or charging processing fees.",
+            "FACT: Genuine government departments do not issue links via printed QR codes distributed on WhatsApp."
+          ],
+          details_kn: [
+            `ಕ್ಯೂಆರ್ ಲಿಂಕ್ '${domain}' ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಹೆಸರನ್ನು ಬಳಸಿ ವಂಚಿಸಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.`,
+            "ಇದನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದರಿಂದ ತೆರೆದುಕೊಳ್ಳುವ ನಕಲಿ ವೆಬ್‌ಸೈಟ್ ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ವಿವರಗಳು ಅಥವಾ ಶುಲ್ಕಗಳನ್ನು ಕೇಳುತ್ತದೆ.",
+            "ಸತ್ಯ: ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಇಲಾಖೆಗಳು ವಾಟ್ಸಾಪ್ ಮೂಲಕ ಕ್ಯೂಆರ್ ಕೋಡ್ ಹಂಚಿಕೊಳ್ಳುವುದಿಲ್ಲ."
+          ],
+          steps_en: [
+            "1. Do NOT click or open this web address on your mobile.",
+            "2. Immediately delete this QR image to protect your bank accounts.",
+            "3. Warn family members that government benefits are never claimed through QR codes."
+          ],
+          steps_kn: [
+            "1. ನಿಮ್ಮ ಮೊಬೈಲ್‌ನಲ್ಲಿ ಈ ಲಿಂಕ್ ಅನ್ನು ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ತೆರೆಯಬೇಡಿ.",
+            "2. ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆಗಳ ಸುರಕ್ಷತೆಗಾಗಿ ತಕ್ಷಣ ಈ ಕ್ಯೂಆರ್ ಚಿತ್ರವನ್ನು ಅಳಿಸಿಹಾಕಿ.",
+            "3. ಸರ್ಕಾರಿ ಸೌಲಭ್ಯಗಳನ್ನು ಕ್ಯೂಆರ್ ಕೋಡ್ ಮೂಲಕ ಪಡೆಯಲಾಗುವುದಿಲ್ಲ ಎಂದು ಮನೆಯವರಿಗೆ ತಿಳಿಸಿ."
+          ]
+        };
+      } else if (foundKeywords.length > 0) {
+        const kwStr = foundKeywords.join(", ");
+        return {
+          score: 89,
+          status: "danger",
+          category_en: "Phishing Website Link",
+          category_kn: "ನಕಲಿ ಜಾಲತಾಣ ಲಿಂಕ್ ಕ್ಯೂಆರ್",
+          message_en: `WARNING: High-Risk QR Link Containing Phishing Terms (${kwStr})!`,
+          message_kn: `ಎಚ್ಚರಿಕೆ: ಹೆಚ್ಚಿನ ಅಪಾಯದ ಕ್ಯೂಆರ್ ಲಿಂಕ್! ಶಂಕಾಸ್ಪದ ಪದಗಳು ಪತ್ತೆಯಾಗಿವೆ (${kwStr})!`,
+          details_en: [
+            `This QR code contains a web link '${domain}' that features suspicious words associated with cyber scams.`,
+            "Scammers use terms like 'KYC', 'verify', or 'free' to trick you into entering personal banking passwords or OTPs.",
+            "Do not open this URL under any circumstances."
+          ],
+          details_kn: [
+            `ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ '${domain}' ಜಾಲತಾಣ ಲಿಂಕ್ ಅನ್ನು ಹೊಂದಿದ್ದು, ವಂಚನೆಗೆ ಬಳಸುವ ಶಂಕಾಸ್ಪದ ಪದಗಳನ್ನು ಒಳಗೊಂಡಿದೆ.`,
+            "ನಿಮ್ಮ ಬ್ಯಾಂಕಿಂಗ್ ಪಾಸ್‌ವರ್ಡ್ ಅಥವಾ ಒಟಿಪಿ ಕದಿಯಲು ವಂಚಕರು 'ಕೆವೈಸಿ (KYC)', 'ಪರಿಶೀಲನೆ (verify)' ಅಥವಾ 'ಉಚಿತ (free)' ಪದಗಳನ್ನು ಬಳಸುತ್ತಾರೆ.",
+            "ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಈ ಲಿಂಕ್ ಅನ್ನು ಓಪನ್ ಮಾಡಬೇಡಿ."
+          ],
+          steps_en: [
+            "1. Close this scanner page and do NOT open the link.",
+            "2. Check official bank channels or utility offices directly if they requested updates.",
+            "3. Report the sender's mobile number if received from an unknown WhatsApp contact."
+          ],
+          steps_kn: [
+            "1. ಈ ಸ್ಕ್ಯಾನರ್ ಪುಟವನ್ನು ಮುಚ್ಚಿ ಮತ್ತು ಆ ಲಿಂಕ್ ಅನ್ನು ಓಪನ್ ಮಾಡಬೇಡಿ.",
+            "2. ಮಾಹಿತಿ ಅಪ್‌ಡೇಟ್ ಮಾಡಲು ನಿಮ್ಮ ಅಧಿಕೃತ ಬ್ಯಾಂಕ್ ಅಥವಾ ಕಚೇರಿಯನ್ನು ನೇರವಾಗಿ ಸಂಪರ್ಕಿಸಿ.",
+            "3. ಅಪರಿಚಿತ ವಾಟ್ಸಾಪ್ ಖಾತೆಯಿಂದ ಬಂದಿದ್ದರೆ ಕಳುಹಿಸಿದವರ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ಬ್ಲಾಕ್ ಮಾಡಿ."
+          ]
+        };
+      } else {
+        return {
+          score: 60,
+          status: "caution",
+          category_en: "Unverified QR Web Link",
+          category_kn: "ಪರಿಶೀಲಿಸದ ಜಾಲತಾಣ ಲಿಂಕ್",
+          message_en: "CAUTION: Unverified Web Link in QR Code.",
+          message_kn: "ಎಚ್ಚರಿಕೆ: ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ಪರಿಶೀಲಿಸದ ವೆಬ್ ಲಿಂಕ್ ಇದೆ.",
+          details_en: [
+            `This QR code opens an external web address: '${domain}'.`,
+            "FraudShield cannot verify the absolute safety of this website registry.",
+            "Ensure you fully trust the provider who printed or shared this QR before entering any private information."
+          ],
+          details_kn: [
+            `ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಬಾಹ್ಯ ಜಾಲತಾಣಕ್ಕೆ ಕರೆದೊಯ್ಯುತ್ತದೆ: '${domain}'.`,
+            "ಫ್ರಾಡ್‌ಶೀಲ್ಡ್ ಈ ವೆಬ್‌ಸೈಟ್‌ನ ಸುರಕ್ಷತೆಯನ್ನು ಖಚಿತಪಡಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+            "ಯಾವುದೇ ಖಾಸಗಿ ಮಾಹಿತಿ ನೀಡುವ ಮುನ್ನ ಕ್ಯೂಆರ್ ನೀಡಿದವರನ್ನು ನೀವು ನಂಬುತ್ತೀರಿ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
+          ]
+        };
+      }
+    }
+
+    // 4. Default Case
     return {
       score: 50,
       status: "caution",
-      message_en: "CAUTION: Unverified QR Link or Text.",
-      message_kn: "ಎಚ್ಚರಿಕೆ: ಪರಿಶೀಲಿಸದ ಕ್ಯೂಆರ್ ಪಠ್ಯ ಮಾಹಿತಿ.",
+      category_en: "Standard QR Text Content",
+      category_kn: "ಸಾಮಾನ್ಯ ಕ್ಯೂಆರ್ ಪಠ್ಯ ಮಾಹಿತಿ",
+      message_en: "CAUTION: Standard QR Text Content.",
+      message_kn: "ಎಚ್ಚರಿಕೆ: ಸಾಮಾನ್ಯ ಕ್ಯೂಆರ್ ಪಠ್ಯ ಮಾಹಿತಿ.",
       details_en: [
-        "Ensure you trust the sender before completing payments or entering links."
+        "This QR code encodes plain text, not a direct bank transfer.",
+        "Text encoded: " + q.substring(0, 100) + (q.length > 100 ? "..." : "")
       ],
       details_kn: [
-        "ಯಾವುದೇ ಲಿಂಕ್ ತೆರೆಯುವ ಮುನ್ನ ಕಳುಹಿಸಿದವರನ್ನು ನೀವು ನಂಬುತ್ತೀರಿ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
+        "ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಕೇವಲ ಸರಳ ಪಠ್ಯವನ್ನು ಹೊಂದಿದೆ, ನೇರ ಬ್ಯಾಂಕ್ ವರ್ಗಾವಣೆಯಲ್ಲ.",
+        "ಪಠ್ಯ ಮಾಹಿತಿ: " + q.substring(0, 100) + (q.length > 100 ? "..." : "")
       ]
     };
   };
@@ -1334,6 +1550,18 @@ export default function App() {
     return (
       <div className={`mt-6 rounded-3xl p-5 border-2 ${styles.bg} shadow-lg space-y-6 transition-all duration-300`}>
         
+        {/* Scanned QR Content Indicator */}
+        {type === 'qr' && (
+          <div className="bg-slate-100 border border-slate-300 rounded-2xl p-4.5">
+            <h5 className="text-sm font-black uppercase tracking-wider text-slate-600 mb-1.5">
+              {lang === 'en' ? "🔍 Found Inside QR Code:" : "🔍 ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ಪತ್ತೆಯಾದ ಮಾಹಿತಿ:"}
+            </h5>
+            <p className="text-base font-extrabold text-slate-800 break-all select-all">
+              {rawInput}
+            </p>
+          </div>
+        )}
+        
         {/* Header Block */}
         <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-6 pb-5 border-b border-black/10">
           
@@ -1489,6 +1717,54 @@ export default function App() {
               <p className="text-base sm:text-lg font-black text-amber-950 leading-snug">
                 {activeTranslations.upgrades.verifyTip}
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Upgraded Feature: Emergency Actions block for Danger (RED) or Caution (YELLOW) */}
+        {(result.status === 'danger' || result.status === 'caution') && (
+          <div className="space-y-4 pt-4 border-t border-black/10">
+            <div className="bg-red-50/80 border border-red-200 rounded-3xl p-5 space-y-4 shadow-sm">
+              <h5 className="text-base sm:text-lg font-black text-red-950 flex items-center gap-2">
+                <span>🚨</span>
+                <span>{activeTranslations.emergency.title}</span>
+              </h5>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* 1. BLOCK PAYMENT */}
+                <button
+                  onClick={() => alert(lang === 'en' ? "Close your payment app immediately" : "ನಿಮ್ಮ ಪಾವತಿ ಆಪ್ ಅನ್ನು ತಕ್ಷಣವೇ ಮುಚ್ಚಿ")}
+                  className="w-full bg-red-600 hover:bg-red-700 active:scale-95 transition-all text-white font-black py-4.5 rounded-2xl text-base sm:text-lg shadow-md border border-red-500 flex flex-col items-center justify-center p-3.5 cursor-pointer text-center"
+                >
+                  <span className="text-xl sm:text-2xl mb-1">🛑</span>
+                  <span className="font-extrabold">{activeTranslations.emergency.blockBtn}</span>
+                  <span className="text-xs font-bold opacity-90 mt-1">{activeTranslations.emergency.blockDesc}</span>
+                </button>
+
+                {/* 2. REPORT FRAUD */}
+                <button
+                  onClick={() => {
+                    alert(lang === 'en' ? "Report this fraud to Indian Cyber Crime portal" : "ಈ ವಂಚನೆಯನ್ನು ಭಾರತೀಯ ಸೈಬರ್ ಕ್ರೈಮ್ ಪೋರ್ಟಲ್‌ಗೆ ವರದಿ ಮಾಡಿ");
+                    window.open("https://cybercrime.gov.in", "_blank");
+                  }}
+                  className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 transition-all text-white font-black py-4.5 rounded-2xl text-base sm:text-lg shadow-md border border-orange-400 flex flex-col items-center justify-center p-3.5 cursor-pointer text-center"
+                >
+                  <span className="text-xl sm:text-2xl mb-1">🚨</span>
+                  <span className="font-extrabold">{activeTranslations.emergency.reportBtn}</span>
+                  <span className="text-xs font-bold opacity-90 mt-1">{activeTranslations.emergency.reportDesc}</span>
+                </button>
+
+                {/* 3. CALL 1930 */}
+                <a
+                  href="tel:1930"
+                  className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all text-white font-black py-4.5 rounded-2xl text-base sm:text-lg shadow-md border border-blue-500 flex flex-col items-center justify-center p-3.5 cursor-pointer text-center no-underline decoration-transparent"
+                >
+                  <span className="text-xl sm:text-2xl mb-1">📞</span>
+                  <span className="font-extrabold">{activeTranslations.emergency.callBtn}</span>
+                  <span className="text-xs font-bold opacity-90 mt-1">{activeTranslations.emergency.callDesc}</span>
+                  <span className="text-[10px] font-bold opacity-80 mt-0.5">{activeTranslations.emergency.callSub}</span>
+                </a>
+              </div>
             </div>
           </div>
         )}
@@ -1751,7 +2027,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-grid-pattern bg-[#fcfdfa] pb-12 flex flex-col font-sans">
+    <div className={`min-h-screen bg-grid-pattern pb-12 flex flex-col font-sans transition-all duration-300 ${darkMode ? 'bg-slate-950 text-slate-100 dark-theme-styles' : 'bg-[#fcfdfa] text-slate-900'} ${largeText ? 'large-text-styles text-lg' : ''}`}>
       
       {/* Dynamic Header */}
       <header className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-800 text-white shadow-lg sticky top-0 z-30">
@@ -1784,6 +2060,36 @@ export default function App() {
                   {user.name} <span className="text-[10px] bg-emerald-500/30 text-emerald-200 font-bold px-2 py-0.5 rounded-full ml-1 select-none">📍 {user.village}</span>
                 </p>
               </div>
+            </div>
+
+            {/* Accessibility Buttons inline next to Kannada Toggle */}
+            <div className="flex items-center gap-1.5 bg-white/10 p-1 rounded-2xl border border-white/15">
+              {/* 1. Dark Mode Toggle */}
+              <button 
+                onClick={toggleDarkMode}
+                title={lang === 'en' ? "Toggle Dark Mode" : "ಕಪ್ಪು ವಿನ್ಯಾಸ ಬದಲಿಸಿ"}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-95 cursor-pointer text-base ${darkMode ? 'bg-indigo-600 text-white border border-indigo-400' : 'bg-transparent text-emerald-100 hover:bg-white/10'}`}
+              >
+                🌙
+              </button>
+
+              {/* 2. Large Text Mode Toggle */}
+              <button 
+                onClick={toggleLargeText}
+                title={lang === 'en' ? "Toggle Large Text" : "ದೊಡ್ಡ ಅಕ್ಷರ ಶೈಲಿ"}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm transition-all active:scale-95 cursor-pointer ${largeText ? 'bg-teal-500 text-white border border-teal-300' : 'bg-transparent text-emerald-100 hover:bg-white/10'}`}
+              >
+                A+
+              </button>
+
+              {/* 3. Text to Speech reads result */}
+              <button 
+                onClick={handleHeaderTTS}
+                title={lang === 'en' ? "Listen to Verdict" : "ಫಲಿತಾಂಶ ಆಲಿಸಿ"}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-95 cursor-pointer text-base ${isPlayingAudio ? 'bg-amber-500 text-slate-950 border border-amber-300 animate-pulse' : 'bg-transparent text-emerald-100 hover:bg-white/10'}`}
+              >
+                🔊
+              </button>
             </div>
 
             <button 

@@ -326,75 +326,151 @@ def analyze_qr_local(qr_input):
     """
     Analyzes QR Code string content locally.
     """
-    qr_clean = qr_input.strip().lower()
+    qr_clean = qr_input.strip()
+    qr_clean_lower = qr_clean.lower()
     
-    # Check if UPI payment link
-    if qr_clean.startswith("upi://pay"):
-        # Extract payee address 'pa' and payee name 'pn'
-        pa_match = re.search(r'pa=([^&]+)', qr_clean)
+    # 1. Check if UPI payment link (UPI URI or plain UPI address)
+    if qr_clean_lower.startswith("upi://pay"):
+        pa_match = re.search(r'pa=([^&]+)', qr_clean, re.IGNORECASE)
         pa = pa_match.group(1) if pa_match else ""
-        return analyze_upi_local(pa)
+        if pa:
+            return analyze_upi_local(pa)
+    elif "@" in qr_clean_lower and " " not in qr_clean_lower and not qr_clean_lower.startswith("http"):
+        return analyze_upi_local(qr_clean)
         
-    # Check if web link
-    if qr_clean.startswith("http://") or qr_clean.startswith("https://") or ".com" in qr_clean or ".info" in qr_clean:
-        if "pmkisan" in qr_clean or "awas" in qr_clean or "scam" in qr_clean:
+    # 2. Check if it contains a Phone Number
+    phone_clean = qr_clean_lower.replace("tel:", "").replace("+91", "").replace(" ", "").strip()
+    if phone_clean.isdigit() and len(phone_clean) >= 10 and len(phone_clean) <= 12:
+        return {
+            "score": 45,
+            "status": "caution",
+            "category_en": "Personal Phone Transfer Link",
+            "category_kn": "ವೈಯಕ್ತಿಕ ಫೋನ್ ಸಂಖ್ಯೆ ಕ್ಯೂಆರ್",
+            "message_en": f"CAUTION: Phone Number detected in QR Code ({phone_clean}).",
+            "message_kn": f"ಎಚ್ಚರಿಕೆ: ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ಫೋನ್ ಸಂಖ್ಯೆ ಪತ್ತೆಯಾಗಿದೆ ({phone_clean}).",
+            "details_en": [
+                "This QR encodes a direct mobile transfer phone number.",
+                "Anyone can generate a QR code with a phone number; it does not guarantee a safe business or utility identity.",
+                "ALWAYS call the person to verify their voice and identity before sending any money. Do not pay if you received this QR from an unknown contact."
+            ],
+            "details_kn": [
+                "ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ನೇರ ಮೊಬೈಲ್ ಹಣ ವರ್ಗಾವಣೆಯ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ಹೊಂದಿದೆ.",
+                "ಯಾರು ಬೇಕಾದರೂ ಫೋನ್ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಕ್ಯೂಆರ್ ಕೋಡ್ ರಚಿಸಬಹುದು; ಇದು ಅವರ ಅಧಿಕೃತತೆಯನ್ನು ಸಾಬೀತುಪಡಿಸುವುದಿಲ್ಲ.",
+                "ಹಣ ಕಳುಹಿಸುವ ಮೊದಲು ವ್ಯಕ್ತಿಗೆ ಕರೆ ಮಾಡಿ ಅವರ ಧ್ವನಿ ಮತ್ತು ಗುರುತನ್ನು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ. ಅಪರಿಚಿತರಿಂದ ಕ್ಯೂಆರ್ ಬಂದಿದ್ದರೆ ಹಣ ವರ್ಗಾಯಿಸಬೇಡಿ."
+            ]
+        }
+
+    # 3. Check if web link
+    is_url = (
+        qr_clean_lower.startswith("http://") or 
+        qr_clean_lower.startswith("https://") or 
+        any(ext in qr_clean_lower for ext in [".com", ".info", ".in", ".org", ".net", ".xyz", ".club"]) or 
+        re.search(r'[a-zA-Z0-9-]+\.[a-zA-Z]{2,}', qr_clean_lower)
+    )
+    if is_url:
+        domain = qr_clean
+        url_match = re.search(r'https?://(?:www\.)?([^/]+)', qr_clean, re.IGNORECASE)
+        if url_match:
+            domain = url_match.group(1)
+        
+        # Check for suspicious keywords
+        suspicious_keywords = ["kyc", "update", "verify", "free", "prize", "lucky", "gift", "pmkisan", "awas", "yojana", "lottery", "win", "reward", "cashback"]
+        found_keywords = [kw for kw in suspicious_keywords if kw in qr_clean_lower]
+        
+        if "pmkisan" in qr_clean_lower or "awas" in qr_clean_lower or "yojana" in qr_clean_lower:
             return {
                 "score": 96,
                 "status": "danger",
                 "category_en": "Phishing QR Link",
                 "category_kn": "ನಕಲಿ ಜಾಲತಾಣ ಲಿಂಕ್ ಕ್ಯೂಆರ್",
-                "message_en": "CRITICAL DANGER: Fraudulent QR Web Link Detected!",
-                "message_kn": "ತೀವ್ರ ಅಪಾಯ: ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ವಂಚನೆಯ ವೆಬ್ ಲಿಂಕ್ ಪತ್ತೆಯಾಗಿದೆ!",
+                "message_en": "CRITICAL DANGER: Fraudulent Government Scheme Phishing Link Detected!",
+                "message_kn": "ತೀವ್ರ ಅಪಾಯ: ನಕಲಿ ಸರ್ಕಾರಿ ಯೋಜನೆಯ ಹೆಸರಿನ ಜಾಲತಾಣ ಲಿಂಕ್ ಪತ್ತೆಯಾಗಿದೆ!",
                 "details_en": [
-                    "This QR code encodes a web address designed to mimic official government portals.",
-                    "Scanning it opens a website that will ask you to login using your bank details or pay processing fees.",
-                    "Official government portals will never spread official links using printed QR codes sent on WhatsApp."
+                    f"The QR link encodes a web address '{domain}' designed to impersonate official government schemes.",
+                    "Scanning it will redirect you to a fake site asking for your bank credentials or charging processing fees.",
+                    "FACT: Genuine government departments do not issue links via printed QR codes distributed on WhatsApp."
                 ],
                 "details_kn": [
-                    "ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಅಧಿಕೃತ ಸರ್ಕಾರಿ ವೆಬ್‌ಸೈಟ್‌ಗಳಂತೆ ನಕಲು ಮಾಡುವ ಜಾಲತಾಣ ಲಿಂಕ್ ಅನ್ನು ಹೊಂದಿದೆ.",
-                    "ಇದನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದರಿಂದ ತೆರೆದುಕೊಳ್ಳುವ ವೆಬ್‌ಸೈಟ್ ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ವಿವರಗಳು ಅಥವಾ ಶುಲ್ಕಗಳನ್ನು ಕೇಳುತ್ತದೆ.",
-                    "ಅಧಿಕೃತ ಸರ್ಕಾರಿ ನಿಗಮಗಳು ವಾಟ್ಸಾಪ್‌ನಲ್ಲಿ ಕ್ಯೂಆರ್ ಕೋಡ್ ಹಂಚಿಕೊಳ್ಳುವ ಮೂಲಕ ಅಧಿಕೃತ ಲಿಂಕ್ ನೀಡುವುದಿಲ್ಲ."
+                    f"ಕ್ಯೂಆರ್ ಲಿಂಕ್ '{domain}' ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಹೆಸರನ್ನು ಬಳಸಿ ವಂಚಿಸಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.",
+                    "ಇದನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದರಿಂದ ತೆರೆದುಕೊಳ್ಳುವ ನಕಲಿ ವೆಬ್‌ಸೈಟ್ ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ವಿವರಗಳು ಅಥವಾ ಶುಲ್ಕಗಳನ್ನು ಕೇಳುತ್ತದೆ.",
+                    "ಸತ್ಯ: ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಇಲಾಖೆಗಳು ವಾಟ್ಸಾಪ್ ಮೂಲಕ ಕ್ಯೂಆರ್ ಕೋಡ್ ಹಂಚಿಕೊಳ್ಳುವುದಿಲ್ಲ."
                 ],
                 "steps_en": [
-                    "1. Do NOT click or open the link on your phone.",
-                    "2. Delete the QR code image immediately.",
-                    "3. Warn others in your family not to scan this printed image."
+                    "1. Do NOT click or open this web address on your mobile.",
+                    "2. Immediately delete this QR image to protect your bank accounts.",
+                    "3. Warn family members that government benefits are never claimed through QR codes."
                 ],
                 "steps_kn": [
-                    "1. ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಈ ಲಿಂಕ್ ಅನ್ನು ಓಪನ್ ಮಾಡಬೇಡಿ.",
-                    "2. ತಕ್ಷಣವೇ ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಚಿತ್ರವನ್ನು ಅಳಿಸಿಹಾಕಿ.",
-                    "3. ಈ ಮುದ್ರಿತ ಚಿತ್ರವನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡದಂತೆ ನಿಮ್ಮ ಮನೆಯ ಇತರರಿಗೂ ತಿಳಿಸಿ."
+                    "1. ನಿಮ್ಮ ಮೊಬೈಲ್‌ನಲ್ಲಿ ಈ ಲಿಂಕ್ ಅನ್ನು ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ತೆರೆಯಬೇಡಿ.",
+                    "2. ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆಗಳ ಸುರಕ್ಷತೆಗಾಗಿ ತಕ್ಷಣ ಈ ಕ್ಯೂಆರ್ ಚಿತ್ರವನ್ನು ಅಳಿಸಿಹಾಕಿ.",
+                    "3. ಸರ್ಕಾರಿ ಸೌಲಭ್ಯಗಳನ್ನು ಕ್ಯೂಆರ್ ಕೋಡ್ ಮೂಲಕ ಪಡೆಯಲಾಗುವುದಿಲ್ಲ ಎಂದು ಮನೆಯವರಿಗೆ ತಿಳಿಸಿ."
+                ]
+            }
+        elif len(found_keywords) > 0:
+            kw_str = ", ".join(found_keywords)
+            return {
+                "score": 89,
+                "status": "danger",
+                "category_en": "Phishing Website Link",
+                "category_kn": "ನಕಲಿ ಜಾಲತಾಣ ಲಿಂಕ್ ಕ್ಯೂಆರ್",
+                "message_en": f"WARNING: High-Risk QR Link Containing Phishing Terms ({kw_str})!",
+                "message_kn": f"ಎಚ್ಚರಿಕೆ: ಹೆಚ್ಚಿನ ಅಪಾಯದ ಕ್ಯೂಆರ್ ಲಿಂಕ್! ಶಂಕಾಸ್ಪದ ಪದಗಳು ಪತ್ತೆಯಾಗಿವೆ ({kw_str})!",
+                "details_en": [
+                    f"This QR code contains a web link '{domain}' that features suspicious words associated with cyber scams.",
+                    "Scammers use terms like 'KYC', 'verify', or 'free' to trick you into entering personal banking passwords or OTPs.",
+                    "Do not open this URL under any circumstances."
+                ],
+                "details_kn": [
+                    f"ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ '{domain}' ಜಾಲತಾಣ ಲಿಂಕ್ ಅನ್ನು ಹೊಂದಿದ್ದು, ವಂಚನೆಗೆ ಬಳಸುವ ಶಂಕಾಸ್ಪದ ಪದಗಳನ್ನು ಒಳಗೊಂಡಿದೆ.",
+                    "ನಿಮ್ಮ ಬ್ಯಾಂಕಿಂಗ್ ಪಾಸ್‌ವರ್ಡ್ ಅಥವಾ ಒಟಿಪಿ ಕದಿಯಲು ವಂಚಕರು 'ಕೆವೈಸಿ (KYC)', 'ಪರಿಶೀಲನೆ (verify)' ಅಥವಾ 'ಉಚಿತ (free)' ಪದಗಳನ್ನು ಬಳಸುತ್ತಾರೆ.",
+                    "ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಈ ಲಿಂಕ್ ಅನ್ನು ಓಪನ್ ಮಾಡಬೇಡಿ."
+                ],
+                "steps_en": [
+                    "1. Close this scanner page and do NOT open the link.",
+                    "2. Check official bank channels or utility offices directly if they requested updates.",
+                    "3. Report the sender's mobile number if received from an unknown WhatsApp contact."
+                ],
+                "steps_kn": [
+                    "1. ಈ ಸ್ಕ್ಯಾನರ್ ಪುಟವನ್ನು ಮುಚ್ಚಿ ಮತ್ತು ಆ ಲಿಂಕ್ ಅನ್ನು ಓಪನ್ ಮಾಡಬೇಡಿ.",
+                    "2. ಮಾಹಿತಿ ಅಪ್‌ಡೇಟ್ ಮಾಡಲು ನಿಮ್ಮ ಅಧಿಕೃತ ಬ್ಯಾಂಕ್ ಅಥವಾ ಕಚೇರಿಯನ್ನು ನೇರವಾಗಿ ಸಂಪರ್ಕಿಸಿ.",
+                    "3. ಅಪರಿಚಿತ ವಾಟ್ಸಾಪ್ ಖಾತೆಯಿಂದ ಬಂದಿದ್ದರೆ ಕಳುಹಿಸಿದವರ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ಬ್ಲಾಕ್ ಮಾಡಿ."
                 ]
             }
         else:
             return {
-                "score": 65,
+                "score": 60,
                 "status": "caution",
+                "category_en": "Unverified QR Web Link",
+                "category_kn": "ಪರಿಶೀಲಿಸದ ಜಾಲತಾಣ ಲಿಂಕ್",
                 "message_en": "CAUTION: Unverified Web Link in QR Code.",
                 "message_kn": "ಎಚ್ಚರಿಕೆ: ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ಪರಿಶೀಲಿಸದ ವೆಬ್ ಲಿಂಕ್ ಇದೆ.",
                 "details_en": [
-                    "This QR code opens an external website.",
-                    "Ensure you trust the brand or utility office who displayed this QR before entering details."
+                    f"This QR code opens an external web address: '{domain}'.",
+                    "FraudShield cannot verify the absolute safety of this website registry.",
+                    "Ensure you fully trust the provider who printed or shared this QR before entering any private information."
                 ],
                 "details_kn": [
-                    "ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಬಾಹ್ಯ ವೆಬ್‌ಸೈಟ್‌ಗೆ ನಿಮ್ಮನ್ನು ಕರೆದೊಯ್ಯುತ್ತದೆ.",
-                    "ಯಾವುದೇ ವಿವರ ನೀಡುವ ಮುನ್ನ ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಪ್ರದರ್ಶಿಸಿದ ಸಂಸ್ಥೆಯನ್ನು ನೀವು ನಂಬುತ್ತೀರಿ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
+                    f"ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಬಾಹ್ಯ ಜಾಲತಾಣಕ್ಕೆ ಕರೆದೊಯ್ಯುತ್ತದೆ: '{domain}'.",
+                    "ಫ್ರಾಡ್‌ಶೀಲ್ಡ್ ಈ ವೆಬ್‌ಸೈಟ್‌ನ ಸುರಕ್ಷತೆಯನ್ನು ಖಚಿತಪಡಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+                    "ಯಾವುದೇ ಖಾಸಗಿ ಮಾಹಿತಿ ನೀಡುವ ಮುನ್ನ ಕ್ಯೂಆರ್ ನೀಡಿದವರನ್ನು ನೀವು ನಂಬುತ್ತೀರಿ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
                 ]
             }
 
-    # Default Case
+    # 4. Default Case (Plain text or generic QR content)
     return {
         "score": 50,
         "status": "caution",
+        "category_en": "Standard QR Text Content",
+        "category_kn": "ಸಾಮಾನ್ಯ ಕ್ಯೂಆರ್ ಪಠ್ಯ ಮಾಹಿತಿ",
         "message_en": "CAUTION: Standard QR Text Content.",
         "message_kn": "ಎಚ್ಚರಿಕೆ: ಸಾಮಾನ್ಯ ಕ್ಯೂಆರ್ ಪಠ್ಯ ಮಾಹಿತಿ.",
         "details_en": [
             "This QR code encodes plain text, not a direct bank transfer.",
-            "Text encoded: " + qr_input[:100] + ("..." if len(qr_input) > 100 else "")
+            "Text encoded: " + qr_clean[:100] + ("..." if len(qr_clean) > 100 else "")
         ],
         "details_kn": [
             "ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಕೇವಲ ಸರಳ ಪಠ್ಯವನ್ನು ಹೊಂದಿದೆ, ನೇರ ಬ್ಯಾಂಕ್ ವರ್ಗಾವಣೆಯಲ್ಲ.",
-            "ಪಠ್ಯ ಮಾಹಿತಿ: " + qr_input[:100]
+            "ಪಠ್ಯ ಮಾಹಿತಿ: " + qr_clean[:100] + ("..." if len(qr_clean) > 100 else "")
         ]
     }
 
