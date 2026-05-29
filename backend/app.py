@@ -6,6 +6,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+import hashlib
+
 
 # Load environment variables
 load_dotenv()
@@ -20,6 +22,24 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Database Models
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    phone = db.Column(db.String(20), unique=True, index=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    village = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "phone": self.phone,
+            "name": self.name,
+            "village": self.village,
+            "created_at": self.created_at.isoformat()
+        }
+
 class ScanHistory(db.Model):
     __tablename__ = 'scan_history'
     id = db.Column(db.Integer, primary_key=True)
@@ -28,6 +48,7 @@ class ScanHistory(db.Model):
     risk_score = db.Column(db.Integer, nullable=False)
     result = db.Column(db.String(50), nullable=False)  # 'safe', 'caution', 'danger'
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     def to_dict(self):
         return {
@@ -36,7 +57,8 @@ class ScanHistory(db.Model):
             "input": self.input,
             "risk_score": self.risk_score,
             "result": self.result,
-            "timestamp": self.timestamp.isoformat()
+            "timestamp": self.timestamp.isoformat(),
+            "user_id": self.user_id
         }
 
 class ReportedScams(db.Model):
@@ -45,13 +67,15 @@ class ReportedScams(db.Model):
     input = db.Column(db.Text, nullable=False)
     scam_type = db.Column(db.String(100), nullable=False)
     reported_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     def to_dict(self):
         return {
             "id": self.id,
             "input": self.input,
             "scam_type": self.scam_type,
-            "reported_at": self.reported_at.isoformat()
+            "reported_at": self.reported_at.isoformat(),
+            "user_id": self.user_id
         }
 
 # Create tables inside application context
@@ -765,6 +789,7 @@ def get_status():
 def analyze_upi():
     data = request.get_json() or {}
     upi_input = data.get("upi", "").strip()
+    user_id = data.get("user_id")
     
     if not upi_input:
         return jsonify({"error": "UPI ID or Phone number is required"}), 400
@@ -780,7 +805,8 @@ def analyze_upi():
             type='upi',
             input=masked_val,
             risk_score=analysis.get('score', 50),
-            result=analysis.get('status', 'caution')
+            result=analysis.get('status', 'caution'),
+            user_id=int(user_id) if user_id else None
         )
         db.session.add(history)
         db.session.commit()
@@ -794,6 +820,7 @@ def analyze_upi():
 def analyze_message():
     data = request.get_json() or {}
     msg_input = data.get("message", "").strip()
+    user_id = data.get("user_id")
     
     if not msg_input:
         return jsonify({"error": "Message or link content is required"}), 400
@@ -809,7 +836,8 @@ def analyze_message():
             type='phishing',
             input=masked_val,
             risk_score=analysis.get('score', 50),
-            result=analysis.get('status', 'caution')
+            result=analysis.get('status', 'caution'),
+            user_id=int(user_id) if user_id else None
         )
         db.session.add(history)
         db.session.commit()
@@ -823,6 +851,7 @@ def analyze_message():
 def analyze_qr():
     data = request.get_json() or {}
     qr_input = data.get("qr", "").strip()
+    user_id = data.get("user_id")
     
     if not qr_input:
         return jsonify({"error": "QR Code data is required"}), 400
@@ -838,7 +867,8 @@ def analyze_qr():
             type='qr',
             input=masked_val,
             risk_score=analysis.get('score', 50),
-            result=analysis.get('status', 'caution')
+            result=analysis.get('status', 'caution'),
+            user_id=int(user_id) if user_id else None
         )
         db.session.add(history)
         db.session.commit()
@@ -852,6 +882,7 @@ def analyze_qr():
 def analyze_otp():
     data = request.get_json() or {}
     otp_input = data.get("message", "").strip()
+    user_id = data.get("user_id")
     
     if not otp_input:
         return jsonify({"error": "OTP message text is required"}), 400
@@ -867,7 +898,8 @@ def analyze_otp():
             type='otp',
             input=masked_val,
             risk_score=analysis.get('score', 50),
-            result=analysis.get('status', 'caution')
+            result=analysis.get('status', 'caution'),
+            user_id=int(user_id) if user_id else None
         )
         db.session.add(history)
         db.session.commit()
@@ -881,6 +913,7 @@ def analyze_otp():
 def analyze_loan_app():
     data = request.get_json() or {}
     loan_input = data.get("app", "").strip()
+    user_id = data.get("user_id")
     
     if not loan_input:
         return jsonify({"error": "Loan App name or link is required"}), 400
@@ -896,7 +929,8 @@ def analyze_loan_app():
             type='loan',
             input=masked_val,
             risk_score=analysis.get('score', 50),
-            result=analysis.get('status', 'caution')
+            result=analysis.get('status', 'caution'),
+            user_id=int(user_id) if user_id else None
         )
         db.session.add(history)
         db.session.commit()
@@ -907,17 +941,90 @@ def analyze_loan_app():
 
 
 # -------------------------------------------------------------
+# User Authentication API Endpoints
+# -------------------------------------------------------------
+
+def hash_password(password):
+    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+@app.route("/api/auth/register", methods=["POST"])
+def auth_register():
+    data = request.get_json() or {}
+    name = data.get("name", "").strip()
+    phone = data.get("phone", "").strip()
+    village = data.get("village", "").strip()
+    password = data.get("password", "").strip()
+
+    if not name or not phone or not village or not password:
+        return jsonify({"error": "Name, Phone number, Village/City name, and Password are required"}), 400
+
+    # Ensure +91 format for phone
+    if not phone.startswith("+91"):
+        phone = f"+91{phone}"
+
+    # Check if user already exists with this phone
+    existing_user = User.query.filter_by(phone=phone).first()
+    if existing_user:
+        return jsonify({"error": "An account with this phone number already exists"}), 400
+
+    p_hash = hash_password(password)
+
+    try:
+        new_user = User(
+            name=name,
+            phone=phone,
+            village=village,
+            password_hash=p_hash
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"success": True, "user": new_user.to_dict()})
+    except Exception as ex:
+        print(f"Error registering user: {ex}")
+        return jsonify({"error": f"Failed to register user: {str(ex)}"}), 500
+
+
+@app.route("/api/auth/login-phone", methods=["POST"])
+def auth_login_phone():
+    data = request.get_json() or {}
+    phone = data.get("phone", "").strip()
+    password = data.get("password", "").strip()
+
+    if not phone or not password:
+        return jsonify({"error": "Phone number and Password are required"}), 400
+
+    if not phone.startswith("+91"):
+        phone = f"+91{phone}"
+
+    try:
+        user = User.query.filter_by(phone=phone).first()
+        if not user or not user.password_hash or user.password_hash != hash_password(password):
+            return jsonify({"error": "Invalid phone number or password"}), 401
+
+        return jsonify({"success": True, "user": user.to_dict()})
+    except Exception as ex:
+        print(f"Error during phone login: {ex}")
+        return jsonify({"error": f"Login failed: {str(ex)}"}), 500
+
+
+
+# -------------------------------------------------------------
 # Database API Endpoints
 # -------------------------------------------------------------
 
 @app.route("/api/scans", methods=["GET"])
 def get_recent_scans():
     try:
-        recent = ScanHistory.query.order_by(ScanHistory.timestamp.desc()).limit(5).all()
+        user_id = request.args.get("user_id")
+        if user_id:
+            recent = ScanHistory.query.filter_by(user_id=int(user_id)).order_by(ScanHistory.timestamp.desc()).limit(5).all()
+        else:
+            recent = ScanHistory.query.order_by(ScanHistory.timestamp.desc()).limit(5).all()
         return jsonify([item.to_dict() for item in recent])
     except Exception as ex:
         print(f"Error fetching scans from database: {ex}")
         return jsonify([])
+
 
 
 @app.route("/api/reports/today-count", methods=["GET"])
@@ -937,6 +1044,7 @@ def report_scam():
     data = request.get_json() or {}
     val = data.get("input", "").strip()
     scam_type = data.get("scam_type", "").strip()
+    user_id = data.get("user_id")
     if not val:
         return jsonify({"error": "Report input is required"}), 400
     if not scam_type:
@@ -944,7 +1052,11 @@ def report_scam():
         
     try:
         masked_val = mask_personal_data('upi', val) if '@' in val or val.isdigit() else mask_personal_data('phishing', val)
-        report = ReportedScams(input=masked_val, scam_type=scam_type)
+        report = ReportedScams(
+            input=masked_val,
+            scam_type=scam_type,
+            user_id=int(user_id) if user_id else None
+        )
         db.session.add(report)
         db.session.commit()
         
