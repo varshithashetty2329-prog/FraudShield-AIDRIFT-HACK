@@ -281,6 +281,7 @@ const TRANSLATIONS = {
 };
 
 export default function App() {
+  const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
   const [lang, setLang] = useState('en'); 
   const [activeTab, setActiveTab] = useState('upi'); 
   
@@ -370,8 +371,8 @@ export default function App() {
   const fetchRecentScans = async (userId = null) => {
     try {
       const url = userId 
-        ? `http://localhost:5000/api/scans?user_id=${userId}`
-        : 'http://localhost:5000/api/scans';
+        ? `${API_URL}/api/scans?user_id=${userId}`
+        : `${API_URL}/api/scans`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -384,7 +385,7 @@ export default function App() {
 
   const handleDeleteScan = async (scanId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/scans/${scanId}`, {
+      const res = await fetch(`${API_URL}/api/scans/${scanId}`, {
         method: 'DELETE'
       });
       if (res.ok) {
@@ -402,7 +403,7 @@ export default function App() {
 
   const fetchTodayReportsCount = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/reports/today-count');
+      const res = await fetch(`${API_URL}/api/reports/today-count`);
       if (res.ok) {
         const data = await res.json();
         setTodayReportsCount(data.count || 0);
@@ -415,7 +416,7 @@ export default function App() {
   const handleReportScam = async (inputVal, scamType) => {
     if (!inputVal) return;
     try {
-      const res = await fetch('http://localhost:5000/api/reports', {
+      const res = await fetch(`${API_URL}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: inputVal, scam_type: scamType, user_id: user?.id })
@@ -456,7 +457,7 @@ export default function App() {
 
     setAuthLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login-phone', {
+      const res = await fetch(`${API_URL}/api/auth/login-phone`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: cleanPhone, password: authPassword })
@@ -513,7 +514,7 @@ export default function App() {
         password: authPassword
       };
 
-      const res = await fetch('http://localhost:5000/api/auth/register', {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1259,7 +1260,7 @@ export default function App() {
     stopAudio();
 
     try {
-      const response = await fetch('http://localhost:5000/api/analyze-upi', {
+      const response = await fetch(`${API_URL}/api/analyze-upi`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ upi: val, user_id: user?.id })
@@ -1286,7 +1287,7 @@ export default function App() {
     stopAudio();
 
     try {
-      const response = await fetch('http://localhost:5000/api/analyze-qr', {
+      const response = await fetch(`${API_URL}/api/analyze-qr`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ qr: val, user_id: user?.id })
@@ -1313,7 +1314,7 @@ export default function App() {
     stopAudio();
 
     try {
-      const response = await fetch('http://localhost:5000/api/analyze-message', {
+      const response = await fetch(`${API_URL}/api/analyze-message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: val, user_id: user?.id })
@@ -1340,7 +1341,7 @@ export default function App() {
     stopAudio();
 
     try {
-      const response = await fetch('http://localhost:5000/api/analyze-otp', {
+      const response = await fetch(`${API_URL}/api/analyze-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: val, user_id: user?.id })
@@ -1367,7 +1368,7 @@ export default function App() {
     stopAudio();
 
     try {
-      const response = await fetch('http://localhost:5000/api/analyze-loan-app', {
+      const response = await fetch(`${API_URL}/api/analyze-loan-app`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ app: val, user_id: user?.id })
