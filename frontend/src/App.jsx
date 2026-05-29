@@ -2,36 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShieldAlert, 
   ShieldCheck, 
-  AlertTriangle, 
   MessageSquare, 
   Smartphone, 
   Volume2, 
   VolumeX, 
-  CheckCircle2, 
-  ExternalLink, 
-  X, 
-  ArrowRight, 
-  HelpCircle,
-  HelpCircle as InfoIcon,
-  ChevronRight,
-  UserCheck
+  QrCode, 
+  KeyRound, 
+  ArrowRight,
+  TrendingDown,
+  CheckCircle2,
+  AlertOctagon,
+  LifeBuoy
 } from 'lucide-react';
 
 const TRANSLATIONS = {
   en: {
-    title: "FraudShield",
+    title: "FraudShield 🛡️",
     subtitle: "AI-Powered Fraud Prevention for Rural India",
     tagline: "Your digital safety shield. Simple warnings in plain language. No complicated terms.",
     langSwitch: "ಕನ್ನಡದಲ್ಲಿ ಓದಿ (ಕನ್ನಡ)",
     tabs: {
-      upi: "🔍 UPI ID / Phone Check",
-      phishing: "✉️ Message / Link Check",
+      upi: "🔍 UPI / Phone Check",
+      qr: "📷 QR Code Scanner",
+      phishing: "✉️ WhatsApp Scan",
+      otp: "🔑 OTP Scam Detector",
+      loan: "💸 Fake Loan Checker",
       simulator: "📱 Safe Pay Simulator"
     },
     upi: {
       title: "UPI / Phone Risk Analyzer",
       description: "Before sending money to someone new, paste their UPI ID or Mobile Number here to check if they are safe.",
-      inputPlaceholder: "Enter UPI ID (e.g. pmkisan-relief@ybl) or 10-digit Phone Number",
+      inputPlaceholder: "Enter UPI ID or 10-digit Phone Number",
       btnCheck: "Check Safety Now",
       checking: "Checking safety...",
       riskScore: "Scam Risk Score",
@@ -45,14 +46,38 @@ const TRANSLATIONS = {
       audioBtn: "🔊 Listen to Warning (Audio)",
       audioStop: "⏹️ Stop Audio"
     },
+    qr: {
+      title: "QR Code Safety Scanner",
+      description: "Did someone send you a QR code on WhatsApp or print it on a poster? Paste its link text OR upload the image to verify.",
+      inputPlaceholder: "Paste the QR code link here...",
+      uploadLabel: "Drop QR code image here or Click to upload",
+      checking: "Reading QR code...",
+      examples: "Try these examples:",
+      btnCheck: "Scan QR Code"
+    },
     phishing: {
       title: "WhatsApp Message & Link Detector",
-      description: "Did you receive a suspicious WhatsApp message, SMS, or web link promising government money? Paste it here to scan for scams.",
+      description: "Did you receive a suspicious WhatsApp message promising government money? Paste it here to scan for scams.",
       inputPlaceholder: "Paste the message or link here...",
       btnCheck: "Scan Message Now",
       scanning: "Scanning message...",
       nextStep: "What you must do next (Safe Advice):",
       audioBtn: "🔊 Listen to Advice (Audio)"
+    },
+    otp: {
+      title: "OTP / Password Scam Detector",
+      description: "Did someone send you a message asking to share a code, OTP, or PIN? Paste it here to verify.",
+      inputPlaceholder: "Paste the OTP request message here...",
+      btnCheck: "Scan for OTP Theft",
+      scanning: "Scanning code request..."
+    },
+    loan: {
+      title: "Fake Loan App Checker",
+      description: "Type the name of a loan app or paste its Google Play link. Predatory lenders charge illegal interest and blackmail families.",
+      inputPlaceholder: "Enter App Name or Play Store URL...",
+      btnCheck: "Verify Loan App Safety",
+      checking: "Checking app registry...",
+      altsLabel: "🌿 Safe RBI & Government Alternatives:"
     },
     nudge: {
       title: "Safe Pay Simulator",
@@ -69,7 +94,48 @@ const TRANSLATIONS = {
       btnConfirm: "Yes, I am 100% sure. Proceed.",
       verifySuccess: "✅ Payment Verified: Below ₹5,000 is safe from urgent high-value locks, but always verify recipients."
     },
-    footer: "FraudShield 🛡️ — Empowers digital literacy in rural communities. Sit Mangaluru AIML Department Hackathon 2026."
+    upgrades: {
+      safePayTitle: "💳 Pay Safely via Official Apps",
+      safePayMsg: "You can securely complete your payment by tapping below:",
+      verifyTip: "⚠️ ALWAYS verify the recipient's verified name and amount on the screen before typing your secret UPI PIN!",
+      scamCategory: "Scam Category:",
+      recoveryTitle: "🛡️ What You Must Do Now (3 Action Steps):",
+      reportLabel: "🚨 Report Scam on Government Cyber Portal",
+      payTriggered: "Redirecting safely to [App]... Verify payee details before entering your PIN!",
+      orText: "OR"
+    },
+    auth: {
+      loginTitle: "Enter FraudShield 🛡️",
+      loginSubtitle: "Sign in to your account for safe transactions",
+      signupTitle: "Create Your Safety Account 🌿",
+      signupSubtitle: "Join to save your scans and check safety risk",
+      phoneLabel: "Phone Number (with +91)",
+      phonePlaceholder: "Enter 10-digit phone number",
+      passwordLabel: "Secret Password",
+      passwordPlaceholder: "Enter password (min 6 characters)",
+      nameLabel: "Full Name",
+      namePlaceholder: "Enter your full name",
+      villageLabel: "Village or City Name",
+      villagePlaceholder: "Enter your village or city name",
+      btnLogin: "Login Securely ➔",
+      btnGoogle: "Sign in with Google",
+      btnSignup: "Create My Account ➔",
+      switchSignup: "New user? Create a free account",
+      switchLogin: "Already have an account? Login here",
+      googleRegistrationNote: "Google Account Connected! Please complete remaining details.",
+      passwordNotRequired: "Password not required (Google Login)",
+      welcome: "Welcome",
+      location: "Location",
+      logout: "Logout",
+      errorPhone: "Please enter a valid 10-digit phone number",
+      errorPassword: "Password must be at least 6 characters",
+      errorName: "Name is required",
+      errorVillage: "Village/City name is required",
+      successRegister: "Account created successfully!",
+      successLogin: "Logged in successfully!",
+      phoneFormatHint: "Format: +919876543210 (Auto-adjusts digits)"
+    },
+    footer: "FraudShield 🛡️ — Empowers digital literacy in rural communities. SIT Mangaluru AIML Department Hackathon 2026."
   },
   kn: {
     title: "ಫ್ರಾಡ್‌ಶೀಲ್ಡ್ (FraudShield) 🛡️",
@@ -77,14 +143,17 @@ const TRANSLATIONS = {
     tagline: "ನಿಮ್ಮ ಡಿಜಿಟಲ್ ಭದ್ರತಾ ಕವಚ. ಯಾವುದೇ ಜಟಿಲ ಪದಗಳಿಲ್ಲದ ಸರಳ ಎಚ್ಚರಿಕೆಗಳು.",
     langSwitch: "Read in English (ಇಂಗ್ಲಿಷ್)",
     tabs: {
-      upi: "🔍 ಯುಪಿಐ ಐಡಿ / ಫೋನ್ ಪರಿಶೀಲನೆ",
-      phishing: "✉️ ಸಂದೇಶ / ಲಿಂಕ್ ಪರಿಶೀಲನೆ",
-      simulator: "📱 ಸುರಕ್ಷಿತ ಪಾವತಿ ಸಿಮ್ಯುಲೇಟರ್"
+      upi: "🔍 ಯುಪಿಐ / ಫೋನ್",
+      qr: "📷 ಕ್ಯೂಆರ್ ಕೋಡ್ ಸ್ಕ್ಯಾನರ್",
+      phishing: "✉️ ವಾಟ್ಸಾಪ್ ಪರಿಶೀಲನೆ",
+      otp: "🔑 ಒಟಿಪಿ ವಂಚನೆ ಪತ್ತೆ",
+      loan: "💸 ಸಾಲದ ಆಪ್ ಪರಿಶೀಲನೆ",
+      simulator: "📱 ಪಾವತಿ ಸಿಮ್ಯುಲೇಟರ್"
     },
     upi: {
       title: "ಯುಪಿಐ / ಫೋನ್ ಅಪಾಯ ವಿಶ್ಲೇಷಕ",
       description: "ಹೊಸಬರಿಗೆ ಹಣ ಕಳುಹಿಸುವ ಮೊದಲು, ಅವರ ಯುಪಿಐ ಐಡಿ ಅಥವಾ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ಇಲ್ಲಿ ಹಾಕಿ ಅದು ಸುರಕ್ಷಿತವಾಗಿದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ.",
-      inputPlaceholder: "ಯುಪಿಐ ಐಡಿ (ಉದಾ: pmkisan-relief@ybl) ಅಥವಾ ೧೦-ಅಂಕಿಯ ಫೋನ್ ಸಂಖ್ಯೆ ಹಾಕಿ",
+      inputPlaceholder: "ಯುಪಿಐ ಐಡಿ ಅಥವಾ ೧೦-ಅಂಕಿಯ ಫೋನ್ ಸಂಖ್ಯೆ ಹಾಕಿ",
       btnCheck: "ಈಗಲೇ ಸುರಕ್ಷತೆ ಪರಿಶೀಲಿಸಿ",
       checking: "ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...",
       riskScore: "ವಂಚನೆಯ ಅಪಾಯದ ಅಂಕ",
@@ -98,6 +167,15 @@ const TRANSLATIONS = {
       audioBtn: "🔊 ಎಚ್ಚರಿಕೆಯನ್ನು ಆಲಿಸಿ (ಆಡಿಯೋ)",
       audioStop: "⏹️ ಆಡಿಯೋ ನಿಲ್ಲಿಸಿ"
     },
+    qr: {
+      title: "ಕ್ಯೂಆರ್ ಕೋಡ್ ಸುರಕ್ಷಾ ಸ್ಕ್ಯಾನರ್",
+      description: "ಯಾರಾದರೂ ನಿಮಗೆ ವಾಟ್ಸಾಪ್‌ನಲ್ಲಿ ಕ್ಯೂಆರ್ ಕೋಡ್ ಕಳುಹಿಸಿದ್ದಾರೆಯೇ ಅಥವಾ ಭಿತ್ತಿಪತ್ರದಲ್ಲಿ ಮುದ್ರಿಸಲಾಗಿದೆಯೇ? ಪರಿಶೀಲಿಸಲು ಅದರ ಲಿಂಕ್ ಪೇಸ್ಟ್ ಮಾಡಿ ಅಥವಾ ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+      inputPlaceholder: "ಕ್ಯೂಆರ್ ಕೋಡ್ ಲಿಂಕ್ ಅನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ...",
+      uploadLabel: "ಕ್ಯೂಆರ್ ಕೋಡ್ ಚಿತ್ರವನ್ನು ಇಲ್ಲಿಗೆ ಎಳೆಯಿರಿ ಅಥವಾ ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ",
+      checking: "ಕ್ಯೂಆರ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...",
+      examples: "ಈ ಉದಾಹರಣೆಗಳನ್ನು ಪ್ರಯತ್ನಿಸಿ:",
+      btnCheck: "ಕ್ಯೂಆರ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ"
+    },
     phishing: {
       title: "ವಾಟ್ಸಾಪ್ ಸಂದೇಶ ಮತ್ತು ಲಿಂಕ್ ಪತ್ತೆಕಾರಕ",
       description: "ಸರ್ಕಾರದಿಂದ ಉಚಿತ ಹಣ ನೀಡುವ ಭರವಸೆ ನೀಡುವ ಶಂಕಾಸ್ಪದ ವಾಟ್ಸಾಪ್ ಸಂದೇಶ, ಎಸ್‌ಎಂಎಸ್ ಅಥವಾ ವೆಬ್ ಲಿಂಕ್ ಬಂದಿದೆಯೇ? ವಂಚನೆ ಪತ್ತೆಹಚ್ಚಲು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ.",
@@ -106,6 +184,21 @@ const TRANSLATIONS = {
       scanning: "ಸ್ಕ್ಯಾನ್ ಮಾಡಲಾಗುತ್ತಿದೆ...",
       nextStep: "ಮುಂದೆ ನೀವು ಮಾಡಬೇಕಾದ ಕೆಲಸ (ಸುರಕ್ಷಿತ ಸಲಹೆ):",
       audioBtn: "🔊 ಸಲಹೆಯನ್ನು ಆಲಿಸಿ (ಆಡಿಯೋ)"
+    },
+    otp: {
+      title: "ಒಟಿಪಿ / ಪಾಸ್‌ವರ್ಡ್ ವಂಚನೆ ಪತ್ತೆಕಾರಕ",
+      description: "ನಿಮ್ಮ ಮೊಬೈಲ್‌ಗೆ ಬಂದ ಒಟಿಪಿ, ರಹಸ್ಯ ಕೋಡ್ ಅಥವಾ ಪಿನ್ ಸಂಖ್ಯೆಯನ್ನು ಹಂಚಿಕೊಳ್ಳುವಂತೆ ಯಾರಾದರೂ ಸಂದೇಶ ಕಳುಹಿಸಿದ್ದಾರೆಯೇ? ಪತ್ತೆಹಚ್ಚಲು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ.",
+      inputPlaceholder: "ಒಟಿಪಿ ಕೇಳುವ ಸಂದೇಶವನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ...",
+      btnCheck: "ಒಟಿಪಿ ವಂಚನೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+      scanning: "ಒಟಿಪಿ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ..."
+    },
+    loan: {
+      title: "ನಕಲಿ ಸಾಲದ ಆಪ್ ಪರಿಶೀಲನೆ",
+      description: "ಯಾವುದೇ ಸಾಲದ ಆಪ್‌ನ ಹೆಸರು ಅಥವಾ ಗೂಗಲ್ ಪ್ಲೇ ಲಿಂಕ್ ಅನ್ನು ಟೈಪ್ ಮಾಡಿ. ಇವುಗಳು ಕಾನೂನುಬಾಹಿರ ಬಡ್ಡಿ ವಿಧಿಸಿ ಕುಟುಂಬದವರಿಗೆ ಬೆದರಿಕೆ ಹಾಕುತ್ತವೆ.",
+      inputPlaceholder: "ಆಪ್ ಹೆಸರು ಅಥವಾ ಪ್ಲೇ ಸ್ಟೋರ್ ಲಿಂಕ್...",
+      btnCheck: "ಸಾಲದ ಆಪ್ ಪರಿಶೀಲಿಸಿ",
+      checking: "ಆಪ್ ನೋಂದಣಿ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...",
+      altsLabel: "🌿 ಸುರಕ್ಷಿತ ಸರ್ಕಾರಿ ಮತ್ತು ಆರ್‌ಬಿಐ ಸಾಲಗಳು:"
     },
     nudge: {
       title: "ಸುರಕ್ಷಿತ ಪಾವತಿ ಸಿಮ್ಯುಲೇಟರ್",
@@ -122,29 +215,105 @@ const TRANSLATIONS = {
       btnConfirm: "ಹೌದು, ನನಗೆ ೧೦೦% ಖಚಿತವಿದೆ. ಮುಂದುವರಿಯಿರಿ.",
       verifySuccess: "✅ ಪಾವತಿ ದೃಢೀಕರಿಸಲಾಗಿದೆ: ₹೫,೦೦೦ ಕ್ಕಿಂತ ಕಡಿಮೆ ಹಣದ ವರ್ಗಾವಣೆಗೆ ತುರ್ತು ಎಚ್ಚರಿಕೆಯ ಅಗತ್ಯವಿಲ್ಲ, ಆದರೆ ಸ್ವೀಕೃತದಾರರನ್ನು ಯಾವಾಗಲೂ ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
     },
+    upgrades: {
+      safePayTitle: "💳 ಅಧಿಕೃತ ಆ್ಯಪ್‌ಗಳ ಮೂಲಕ ಸುರಕ್ಷಿತವಾಗಿ ಪಾವತಿಸಿ",
+      safePayMsg: "ಕೆಳಗೆ ಕ್ಲಿಕ್ ಮಾಡುವ ಮೂಲಕ ನಿಮ್ಮ ಪಾವತಿಯನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಪೂರ್ಣಗೊಳಿಸಬಹುದು:",
+      verifyTip: "⚠️ ನಿಮ್ಮ ರಹಸ್ಯ ಯುಪಿಐ ಪಿನ್ ನಮೂದಿಸುವ ಮೊದಲು ಮೊತ್ತ ಮತ್ತು ಸ್ವೀಕೃತದಾರರ ಹೆಸರನ್ನು ಯಾವಾಗಲೂ ಪಾವತಿ ಪರದೆಯಲ್ಲಿ ಪರಿಶೀಲಿಸಿ!",
+      scamCategory: "ವಂಚನೆಯ ವರ್ಗ:",
+      recoveryTitle: "🛡️ ತಕ್ಷಣ ನೀವು ಮಾಡಬೇಕಾದ ೩ ಕೆಲಸಗಳು (ರಕ್ಷಣಾ ನಿಯಮಗಳು):",
+      reportLabel: "🚨 ಸರ್ಕಾರಿ ಸೈಬರ್ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ವಂಚನೆ ವರದಿ ಮಾಡಿ",
+      payTriggered: "ಅಧಿಕೃತ [App] ಆ್ಯಪ್‌ಗೆ ಸುರಕ್ಷಿತವಾಗಿ ಮರುನಿರ್ದೇಶಿಸಲಾಗುತ್ತಿದೆ... ಪಿನ್ ದಾಖಲಿಸುವ ಮುನ್ನ ಹೆಸರು ಪರಿಶೀಲಿಸಿ!",
+      orText: "ಅಥವಾ"
+    },
+    auth: {
+      loginTitle: "ಫ್ರಾಡ್‌ಶೀಲ್ಡ್ ಒಳಗೆ ಪ್ರವೇಶಿಸಿ 🛡️",
+      loginSubtitle: "ಸುರಕ್ಷಿತ ವಹಿವಾಟುಗಳಿಗಾಗಿ ನಿಮ್ಮ ಖಾತೆಗೆ ಲಾಗಿನ್ ಮಾಡಿ",
+      signupTitle: "ನಿಮ್ಮ ಸುರಕ್ಷತಾ ಖಾತೆ ರಚಿಸಿ 🌿",
+      signupSubtitle: "ನಿಮ್ಮ ಪರಿಶೀಲನೆಗಳನ್ನು ಉಳಿಸಲು ಮತ್ತು ವಂಚನೆ ಅಪಾಯ ಪತ್ತೆಹಚ್ಚಲು ಸೇರಿಕೊಳ್ಳಿ",
+      phoneLabel: "ಫೋನ್ ಸಂಖ್ಯೆ (+91 ಜೊತೆಗೆ)",
+      phonePlaceholder: "೧೦-ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಹಾಕಿ",
+      passwordLabel: "ರಹಸ್ಯ ಪಾಸ್‌ವರ್ಡ್",
+      passwordPlaceholder: "ಪಾಸ್‌ವರ್ಡ್ ಹಾಕಿ (ಕನಿಷ್ಠ ೬ ಅಕ್ಷರಗಳು)",
+      nameLabel: "ಪೂರ್ಣ ಹೆಸರು",
+      namePlaceholder: "ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರನ್ನು ಬರೆಯಿರಿ",
+      villageLabel: "ಗ್ರಾಮ ಅಥವಾ ನಗರದ ಹೆಸರು",
+      villagePlaceholder: "ನಿಮ್ಮ ಗ್ರಾಮ ಅಥವಾ ನಗರದ ಹೆಸರು ಬರೆಯಿರಿ",
+      btnLogin: "ಸುರಕ್ಷಿತವಾಗಿ ಲಾಗಿನ್ ಮಾಡಿ ➔",
+      btnGoogle: "ಗೂಗಲ್ (Google) ಜೊತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ",
+      btnSignup: "ನನ್ನ ಖಾತೆ ರಚಿಸಿ ➔",
+      switchSignup: "ಹೊಸ ಬಳಕೆದಾರರೇ? ಉಚಿತ ಖಾತೆಯನ್ನು ರಚಿಸಿ",
+      switchLogin: "ಈಗಾಗಲೇ ಖಾತೆ ಹೊಂದಿದ್ದೀರಾ? ಇಲ್ಲಿ ಲಾಗಿನ್ ಮಾಡಿ",
+      googleRegistrationNote: "ಗೂಗಲ್ ಖಾತೆ ಸಂಪರ್ಕಗೊಂಡಿದೆ! ದಯವಿಟ್ಟು ಉಳಿದ ವಿವರಗಳನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ.",
+      passwordNotRequired: "ಪಾಸ್‌ವರ್ಡ್ ಅಗತ್ಯವಿಲ್ಲ (ಗೂಗಲ್ ಲಾಗಿನ್)",
+      welcome: "ಸ್ವಾಗತ",
+      location: "ಸ್ಥಳ",
+      logout: "ಹೊರಹೋಗಿ (Logout)",
+      errorPhone: "ದಯವಿಟ್ಟು ಸರಿಯಾದ ೧೦-ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ಹಾಕಿ",
+      errorPassword: "ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ ೬ ಅಕ್ಷರಗಳಾಗಿರಬೇಕು",
+      errorName: "ಹೆಸರು ಅತ್ಯಗತ್ಯ",
+      errorVillage: "ಗ್ರಾಮ ಅಥವಾ ನಗರದ ಹೆಸರು ಅತ್ಯಗತ್ಯ",
+      successRegister: "ಖಾತೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ!",
+      successLogin: "ಯಶಸ್ವಿಯಾಗಿ ಲಾಗಿನ್ ಆಗಿದ್ದೀರಿ!",
+      phoneFormatHint: "ಮಾದರಿ: +919876543210 (ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತದೆ)"
+    },
     footer: "ಫ್ರಾಡ್‌ಶೀಲ್ಡ್ 🛡️ — ಗ್ರಾಮೀಣ ಸಮುದಾಯಗಳಲ್ಲಿ ಡಿಜಿಟಲ್ ಜಾಗೃತಿ ಮೂಡಿಸಲು ನೆರವಾಗುತ್ತದೆ. SIT ಮಂಗಳೂರು AIML ವಿಭಾಗ ಹ್ಯಾಕಥಾನ್ ೨೦೨೬."
   }
 };
 
 export default function App() {
-  const [lang, setLang] = useState('en'); // 'en' or 'kn'
-  const [activeTab, setActiveTab] = useState('upi'); // 'upi', 'phishing', 'simulator'
+  const [lang, setLang] = useState('en'); 
+  const [activeTab, setActiveTab] = useState('upi'); 
+  
+  // Authentication states
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('fs_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [authView, setAuthView] = useState('login'); // 'login', 'signup'
+  const [authPhone, setAuthPhone] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authName, setAuthName] = useState('');
+  const [authVillage, setAuthVillage] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState(''); 
   
   // Audio state
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [currentUtterance, setCurrentUtterance] = useState(null);
 
-  // Feature 1: UPI Risk Analyzer state
+  // Database integrations state
+  const [recentScans, setRecentScans] = useState([]);
+  const [todayReportsCount, setTodayReportsCount] = useState(0);
+
+  // Tab Results
   const [upiInput, setUpiInput] = useState('');
   const [upiResult, setUpiResult] = useState(null);
   const [upiLoading, setUpiLoading] = useState(false);
 
-  // Feature 2: Phishing Detector state
+  const [qrInput, setQrInput] = useState('');
+  const [qrResult, setQrResult] = useState(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState('');
+
+  // Camera QR Scanning additions
+  const [qrSubTab, setQrSubTab] = useState('camera'); // 'camera', 'upload', 'paste'
+  const [cameraStream, setCameraStream] = useState(null);
+  const [cameraError, setCameraError] = useState(null);
+  const videoRef = React.useRef(null);
+  const canvasRef = React.useRef(null);
+
   const [messageInput, setMessageInput] = useState('');
   const [messageResult, setMessageResult] = useState(null);
   const [messageLoading, setMessageLoading] = useState(false);
 
-  // Feature 3: Safe Pay Simulator state
+  const [otpInput, setOtpInput] = useState('');
+  const [otpResult, setOtpResult] = useState(null);
+  const [otpLoading, setOtpLoading] = useState(false);
+
+  const [loanInput, setLoanInput] = useState('');
+  const [loanResult, setLoanResult] = useState(null);
+  const [loanLoading, setLoanLoading] = useState(false);
+
+  // Simulator state
   const [simRecipient, setSimRecipient] = useState('');
   const [simAmount, setSimAmount] = useState('');
   const [showNudgeModal, setShowNudgeModal] = useState(false);
@@ -155,59 +324,371 @@ export default function App() {
     noPrize: false
   });
 
+  // Database API fetch and report actions
+  const fetchRecentScans = async (userId = null) => {
+    try {
+      const url = userId 
+        ? `http://localhost:5000/api/scans?user_id=${userId}`
+        : 'http://localhost:5000/api/scans';
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        setRecentScans(data);
+      }
+    } catch (err) {
+      console.warn("Error fetching scans from database:", err);
+    }
+  };
+
+  const fetchTodayReportsCount = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/reports/today-count');
+      if (res.ok) {
+        const data = await res.json();
+        setTodayReportsCount(data.count || 0);
+      }
+    } catch (err) {
+      console.warn("Error fetching reports count from database:", err);
+    }
+  };
+
+  const handleReportScam = async (inputVal, scamType) => {
+    if (!inputVal) return;
+    try {
+      const res = await fetch('http://localhost:5000/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: inputVal, scam_type: scamType, user_id: user?.id })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setTodayReportsCount(data.count || 0);
+          alert(lang === 'en'
+            ? "🚨 Scam successfully reported to official databases! Thank you for protecting the community."
+            : "🚨 ವಂಚನೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ವರದಿ ಮಾಡಲಾಗಿದೆ! ಸಮುದಾಯವನ್ನು ರಕ್ಷಿಸಿದ್ದಕ್ಕಾಗಿ ಧನ್ಯವಾದಗಳು."
+          );
+        }
+      }
+    } catch (err) {
+      console.error("Error reporting scam:", err);
+      alert("Error reporting scam. Please try again.");
+    }
+  };
+
+  // Authentication Handlers
+  const handlePhoneLogin = async (e) => {
+    if (e) e.preventDefault();
+    setAuthError('');
+    
+    // Validate phone number
+    const cleanPhone = authPhone.trim().replace(/\s+/g, '');
+    const phoneDigitsOnly = cleanPhone.replace(/^\+91/, '');
+    if (!phoneDigitsOnly.match(/^\d{10}$/)) {
+      setAuthError(activeTranslations.auth.errorPhone);
+      return;
+    }
+
+    if (authPassword.length < 6) {
+      setAuthError(activeTranslations.auth.errorPassword);
+      return;
+    }
+
+    setAuthLoading(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login-phone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: cleanPhone, password: authPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+      if (data.success && data.user) {
+        setUser(data.user);
+        localStorage.setItem('fs_user', JSON.stringify(data.user));
+        alert(activeTranslations.auth.successLogin);
+      }
+    } catch (err) {
+      console.error("Phone login error:", err);
+      setAuthError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    if (e) e.preventDefault();
+    setAuthError('');
+
+    if (!authName.trim()) {
+      setAuthError(activeTranslations.auth.errorName);
+      return;
+    }
+
+    const cleanPhone = authPhone.trim().replace(/\s+/g, '');
+    const phoneDigitsOnly = cleanPhone.replace(/^\+91/, '');
+    if (!phoneDigitsOnly.match(/^\d{10}$/)) {
+      setAuthError(activeTranslations.auth.errorPhone);
+      return;
+    }
+
+    if (!authVillage.trim()) {
+      setAuthError(activeTranslations.auth.errorVillage);
+      return;
+    }
+
+    if (authPassword.length < 6) {
+      setAuthError(activeTranslations.auth.errorPassword);
+      return;
+    }
+
+    setAuthLoading(true);
+    try {
+      const payload = {
+        name: authName.trim(),
+        phone: cleanPhone,
+        village: authVillage.trim(),
+        password: authPassword
+      };
+
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+
+      if (data.success && data.user) {
+        setUser(data.user);
+        localStorage.setItem('fs_user', JSON.stringify(data.user));
+        alert(activeTranslations.auth.successRegister);
+        
+        // Clear auth fields
+        setAuthPhone('');
+        setAuthPassword('');
+        setAuthName('');
+        setAuthVillage('');
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      setAuthError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('fs_user');
+    // Clear auth fields
+    setAuthPhone('');
+    setAuthPassword('');
+    setAuthName('');
+    setAuthVillage('');
+  };
+
+  // Mount effect to fetch initial data
+  useEffect(() => {
+    let active = true;
+    const timer = setTimeout(() => {
+      if (active) {
+        fetchRecentScans(user?.id);
+        fetchTodayReportsCount();
+      }
+    }, 0);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [user]);
+
   const activeTranslations = TRANSLATIONS[lang];
 
-  // Stop any speaking audio on tab or language change
-  useEffect(() => {
-    stopAudio();
-  }, [activeTab, lang]);
+  async function startCamera() {
+    setCameraError(null);
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" }
+        });
+        setCameraStream(stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.error("Camera access error:", err);
+        setCameraError(lang === 'en' 
+          ? "Unable to access device camera. Please check permissions or upload a photo instead."
+          : "ಮೊಬೈಲ್ ಕ್ಯಾಮೆರಾ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ದಯವಿಟ್ಟು ಅನುಮತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ ಅಥವಾ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+        );
+      }
+    } else {
+      setCameraError(lang === 'en'
+        ? "Camera scanner is not supported on this browser."
+        : "ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಕ್ಯಾಮೆರಾ ಸ್ಕ್ಯಾನರ್ ಬೆಂಬಲಿಸುವುದಿಲ್ಲ."
+      );
+    }
+  }
 
-  const stopAudio = () => {
+  function stopCamera() {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+  }
+
+  // Sync Camera stream capture with active tabs
+  useEffect(() => {
+    let active = true;
+    let timer = null;
+    if (activeTab === 'qr' && qrSubTab === 'camera') {
+      timer = setTimeout(() => {
+        if (active) {
+          startCamera();
+        }
+      }, 0);
+    } else {
+      timer = setTimeout(() => {
+        if (active) {
+          stopCamera();
+        }
+      }, 0);
+    }
+    return () => {
+      active = false;
+      if (timer) clearTimeout(timer);
+      stopCamera();
+    };
+  }, [activeTab, qrSubTab]);
+
+  // Real-time canvas frame parsing animation loop
+  useEffect(() => {
+    let animationId = null;
+    let isScanning = true;
+
+    const tick = () => {
+      if (!isScanning) return;
+      
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      
+      if (video && video.readyState === video.HAVE_ENOUGH_DATA && canvas) {
+        const ctx = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        if (window.jsQR) {
+          const code = window.jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          });
+          
+          if (code && code.data) {
+            isScanning = false;
+            console.log("QR Code Decoded live:", code.data);
+            
+            // Release tracks immediately
+            if (cameraStream) {
+              cameraStream.getTracks().forEach(track => track.stop());
+              setCameraStream(null);
+            }
+            
+            setQrInput(code.data);
+            handleCheckQr(null, code.data);
+            return;
+          }
+        }
+      }
+      
+      if (isScanning && activeTab === 'qr' && qrSubTab === 'camera' && cameraStream) {
+        animationId = requestAnimationFrame(tick);
+      }
+    };
+
+    if (activeTab === 'qr' && qrSubTab === 'camera' && cameraStream) {
+      animationId = requestAnimationFrame(tick);
+    }
+
+    return () => {
+      isScanning = false;
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [activeTab, qrSubTab, cameraStream]);
+
+  function stopAudio() {
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
     setIsPlayingAudio(false);
-    setCurrentUtterance(null);
-  };
+  }
+
+  function clearAllResults() {
+    setUpiResult(null);
+    setQrResult(null);
+    setMessageResult(null);
+    setOtpResult(null);
+    setLoanResult(null);
+    setSimMessage('');
+    setUploadedFileName('');
+  }
+
+  useEffect(() => {
+    let active = true;
+    const timer = setTimeout(() => {
+      if (active) {
+        stopAudio();
+        clearAllResults();
+      }
+    }, 0);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [activeTab, lang]);
 
   const playTTS = (text, targetLang) => {
     stopAudio();
     if (!window.speechSynthesis) {
-      alert("Text-to-speech is not supported on this browser.");
+      alert("Speech synthesis is not supported in this browser.");
       return;
     }
 
     const utterance = new SpeechSynthesisUtterance(text);
-    // Try to find native Kannada or English voices
     const voices = window.speechSynthesis.getVoices();
+    
     if (targetLang === 'kn') {
-      // Find Kannada voice, typical matches: kn-IN, Noto Sans Kannada, etc.
       const knVoice = voices.find(v => v.lang.includes('kn') || v.lang.includes('KN') || v.name.toLowerCase().includes('kannada'));
       if (knVoice) {
         utterance.voice = knVoice;
       }
       utterance.lang = 'kn-IN';
-      utterance.rate = 0.85; // Speak slightly slower for rural users
+      utterance.rate = 0.8;
     } else {
-      const enVoice = voices.find(v => v.lang.includes('en-IN') || v.lang.includes('en-US'));
+      const enVoice = voices.find(v => v.lang.includes('en-IN') || v.lang.includes('en-GB'));
       if (enVoice) {
         utterance.voice = enVoice;
       }
       utterance.lang = 'en-IN';
-      utterance.rate = 0.9;
+      utterance.rate = 0.85;
     }
 
     utterance.onend = () => {
       setIsPlayingAudio(false);
-      setCurrentUtterance(null);
     };
 
     utterance.onerror = () => {
       setIsPlayingAudio(false);
-      setCurrentUtterance(null);
     };
 
-    setCurrentUtterance(utterance);
     setIsPlayingAudio(true);
     window.speechSynthesis.speak(utterance);
   };
@@ -221,17 +702,29 @@ export default function App() {
       return {
         score: 95,
         status: "danger",
+        category_en: "Government Impersonation",
+        category_kn: "ಸರ್ಕಾರಿ ಹೆಸರಿನ ವಂಚನೆ",
         message_en: "CRITICAL DANGER: Fake Government Scheme Impersonation detected!",
         message_kn: "ತೀವ್ರ ಅಪಾಯ: ನಕಲಿ ಸರ್ಕಾರಿ ಯೋಜನೆಯ ಹೆಸರು ಪತ್ತೆಯಾಗಿದೆ!",
         details_en: [
           "The UPI address contains 'pmkisan' or 'relief' which is designed to look like the official PM-KISAN agricultural scheme.",
-          "Official government relief funds use official government UPI addresses (typically ending in @sbi or @upi verified merchants), never ordinary '@ybl' or individual accounts.",
+          "Official government relief funds use official government UPI addresses, never '@ybl' or individual handles.",
           "This is a common scam targeting rural farmers to steal their hard-earned money."
         ],
         details_kn: [
           "ಯುಪಿಐ ವಿಳಾಸವು 'pmkisan' ಅಥವಾ 'relief' ಅನ್ನು ಒಳಗೊಂಡಿದೆ, ಇದು ಅಧಿಕೃತ ಪಿಎಂ-ಕಿಸಾನ್ ಕೃಷಿ ಯೋಜನೆಯಂತೆ ಕಾಣಿಸಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.",
-          "ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಪರಿಹಾರ ನಿಧಿಗಳು ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಯುಪಿಐ ವಿಳಾಸಗಳನ್ನು ಬಳಸುತ್ತವೆ (ಸಾಮಾನ್ಯವಾಗಿ @sbi ಅಥವಾ @upi ಪರಿಶೀಲಿಸಿದ ವ್ಯಾಪಾರಿಗಳು), ಎಂದಿಗೂ ಸಾಮಾನ್ಯ '@ybl' ಅಥವಾ ವೈಯಕ್ತಿಕ ಖಾತೆಗಳನ್ನು ಬಳಸುವುದಿಲ್ಲ.",
+          "ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಪರಿಹಾರ ನಿಧಿಗಳು ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಯುಪಿಐ ವಿಳಾಸಗಳನ್ನು ಬಳಸುತ್ತವೆ, ಎಂದಿಗೂ ಸಾಮಾನ್ಯ '@ybl' ಅಥವಾ ವೈಯಕ್ತಿಕ ಖಾತೆಗಳನ್ನು ಬಳಸುವುದಿಲ್ಲ.",
           "ಇದು ಗ್ರಾಮೀಣ ರೈತರ ಕಷ್ಟದ ಹಣವನ್ನು ದೋಚಲು ವಂಚಕರು ಬಳಸುವ ಸಾಮಾನ್ಯ ತಂತ್ರವಾಗಿದೆ."
+        ],
+        steps_en: [
+          "1. Do NOT transfer any money to this address.",
+          "2. Report the contact on WhatsApp where you received this payment link.",
+          "3. Inform your local Gram Panchayat or relative immediately."
+        ],
+        steps_kn: [
+          "1. ಈ ವಿಳಾಸಕ್ಕೆ ಯಾವುದೇ ಹಣವನ್ನು ವರ್ಗಾಯಿಸಬೇಡಿ.",
+          "2. ಈ ಪಾವತಿ ಲಿಂಕ್ ಬಂದ ವಾಟ್ಸಾಪ್ ಸಂಪರ್ಕವನ್ನು ವರದಿ ಮಾಡಿ.",
+          "3. ತಕ್ಷಣವೇ ನಿಮ್ಮ ಸ್ಥಳೀಯ ಗ್ರಾಮ್ ಪಂಚಾಯತ್ ಅಥವಾ ವಿಶ್ವಾಸಾರ್ಹರಿಗೆ ತಿಳಿಸಿ."
         ]
       };
     }
@@ -244,37 +737,13 @@ export default function App() {
         message_kn: "ಸುರಕ್ಷಿತ: ಇದು ಪರಿಶೀಲಿಸಲ್ಪಟ್ಟ ಅಧಿಕೃತ ವ್ಯಾಪಾರ ಖಾತೆಯಾಗಿದೆ.",
         details_en: [
           "This UPI ID is registered to a standard bank merchant handle (@icici / @sbi).",
-          "No suspicious high-pressure behavior or scam history is detected for this merchant account.",
-          "Safe for regular, verified payments."
+          "No suspicious high-pressure behavior or scam history is detected for this merchant account."
         ],
         details_kn: [
           "ಈ ಯುಪಿಐ ಐಡಿ ಪ್ರಮಾಣಿತ ಬ್ಯಾಂಕ್ ವ್ಯಾಪಾರಿ ಹ್ಯಾಂಡಲ್‌ನಲ್ಲಿ ನೋಂದಾಯಿಸಲ್ಪಟ್ಟಿದೆ (@icici / @sbi).",
-          "ಈ ವ್ಯಾಪಾರ ಖಾತೆಗೆ ಯಾವುದೇ ಶಂಕಾಸ್ಪದ ವಂಚನೆಯ ಇತಿಹಾಸ ಕಂಡುಬಂದಿಲ್ಲ.",
-          "ನಿಯಮಿತ, ಪರಿಶೀಲಿಸಿದ ಪಾವತಿಗಳಿಗೆ ಸುರಕ್ಷಿತವಾಗಿದೆ."
+          "ಈ ವ್ಯಾಪಾರ ಖಾತೆಗೆ ಯಾವುದೇ ಶಂಕಾಸ್ಪದ ವಂಚನೆಯ ಇತಿಹಾಸ ಕಂಡುಬಂದಿಲ್ಲ."
         ]
       };
-    }
-
-    const danger_keywords = ["lottery", "gift", "prize", "cashback", "win", "rewards", "lucky", "kbc", "phonepe-reward", "awas", "yojana", "police", "customs", "fine"];
-    for (let kw of danger_keywords) {
-      if (u.includes(kw)) {
-        return {
-          score: 88,
-          status: "danger",
-          message_en: `WARNING: Suspected Prize / Scheme Scam UPI ID containing '${kw}'!`,
-          message_kn: `ಎಚ್ಚರಿಕೆ: ಬಹುಮಾನ ಅಥವಾ ಉಡುಗೊರೆ ಹೆಸರಿನಲ್ಲಿ ವಂಚಿಸುವ ಶಂಕಾಸ್ಪದ ಯುಪಿಐ ಐಡಿ. '${kw}' ಪದ ಪತ್ತೆಯಾಗಿದೆ!`,
-          details_en: [
-            `The payment address contains '${kw}', which is a typical hook used by cyber-criminals to attract victims with fake reward schemes.`,
-            "Genuine platforms will never ask you to send money to a personal or random UPI address to receive a reward.",
-            "Do not transfer any money. It is highly likely to be a scam."
-          ],
-          details_kn: [
-            `ಪಾವತಿ ವಿಳಾಸವು '${kw}' ಅನ್ನು ಒಳಗೊಂಡಿದೆ, ಇದು ಸೈಬರ್ ಅಪರಾಧಿಗಳು ನಕಲಿ ಬಹುಮಾನ ಯೋಜನೆಗಳೊಂದಿಗೆ ಜನರನ್ನು ಆಕರ್ಷಿಸಲು ಬಳಸುವ ವಿಶಿಷ್ಟ ಪದವಾಗಿದೆ.`,
-            "ನಿಜವಾದ ಸಂಸ್ಥೆಗಳು ಬಹುಮಾನವನ್ನು ನೀಡಲು ವೈಯಕ್ತಿಕ ಅಥವಾ ಯಾದೃಚ್ಛಿಕ ಯುಪಿಐ ವಿಳಾಸಕ್ಕೆ ಹಣವನ್ನು ಕಳುಹಿಸಲು ಎಂದಿಗೂ ಕೇಳುವುದಿಲ್ಲ.",
-            "ಯಾವುದೇ ಹಣವನ್ನು ವರ್ಗಾಯಿಸಬೇಡಿ. ಇದು ವಂಚನೆಯಾಗಿರುವ ಸಾಧ್ಯತೆ ತುಂಬಾ ಹೆಚ್ಚಿದೆ."
-          ]
-        };
-      }
     }
 
     const isPhone = /^\+?(91)?[6-9]\d{9}$/.test(u.split('@')[0]) || /^\d{10}$/.test(u);
@@ -286,13 +755,11 @@ export default function App() {
         message_kn: "ಎಚ್ಚರಿಕೆ: ಇದು ಪರಿಶೀಲಿಸದ ವೈಯಕ್ತಿಕ ಫೋನ್ ಸಂಖ್ಯೆ ವರ್ಗಾವಣೆಯಾಗಿದೆ.",
         details_en: [
           "This payment is directly linked to an individual's phone number.",
-          "Anyone can link their bank account to a phone number. It does not prove their identity.",
-          "CRITICAL RULE: Call the person to verify their voice and identity before sending money. Do not pay if you received this number via WhatsApp from an unknown contact."
+          "CRITICAL RULE: Call the person to verify their voice and identity before sending money."
         ],
         details_kn: [
           "ಈ ಪಾವತಿಯು ನೇರವಾಗಿ ವ್ಯಕ್ತಿಯ ಫೋನ್ ಸಂಖ್ಯೆಗೆ ಸಂಬಂಧಿಸಿದೆ.",
-          "ಯಾರು ಬೇಕಾದರೂ ತಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆಯನ್ನು ಫೋನ್ ಸಂಖ್ಯೆಗೆ ಲಿಂಕ್ ಮಾಡಬಹುದು. ಇದು ಅವರ ಗುರುತನ್ನು ಸಾಬೀತುಪಡಿಸುವುದಿಲ್ಲ.",
-          "ಪ್ರಮುಖ ನಿಯಮ: ಹಣವನ್ನು ಕಳುಹಿಸುವ ಮೊದಲು ವ್ಯಕ್ತಿಗೆ ಕರೆ ಮಾಡಿ ಅವರ ಧ್ವನಿ ಮತ್ತು ಗುರುತನ್ನು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ. ಅಪರಿಚಿತರಿಂದ ವಾಟ್ಸಾಪ್ ಮೂಲಕ ಈ ಸಂಖ್ಯೆ ಬಂದಿದ್ದರೆ ಹಣ ಕಳುಹಿಸಬೇಡಿ."
+          "ಪ್ರಮುಖ ನಿಯಮ: ಹಣವನ್ನು ಕಳುಹಿಸುವ ಮೊದಲು ವ್ಯಕ್ತಿಗೆ ಕರೆ ಮಾಡಿ ಅವರ ಧ್ವನಿ ಮತ್ತು ಗುರುತನ್ನು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
         ]
       };
     }
@@ -304,13 +771,60 @@ export default function App() {
       message_kn: "ಎಚ್ಚರಿಕೆ: ಅಪರಿಚಿತ ವ್ಯಕ್ತಿ ಅಥವಾ ನೋಂದಾಯಿಸದ ಪಾವತಿ ವಿಳಾಸ.",
       details_en: [
         "This is a standard custom personal UPI ID, not a verified business.",
-        "Always double-check the recipient name displayed in your payment app (e.g. PhonePe, GPay, Paytm) before clicking 'Pay'.",
-        "If someone created urgency by telling you your bank account, electricity bill, or phone service is expiring, do not pay."
+        "Always double-check the recipient name displayed in your payment app before confirming."
       ],
       details_kn: [
         "ಇದು ಸಾಮಾನ್ಯ ವೈಯಕ್ತಿಕ ಯುಪಿಐ ಐಡಿಯಾಗಿದೆ, ಪರಿಶೀಲಿಸಿದ ವ್ಯಾಪಾರವಲ್ಲ.",
-        "ಪಾವತಿ ಮಾಡುವ ಮೊದಲು ನಿಮ್ಮ ಆ್ಯಪ್‌ನಲ್ಲಿ (PhonePe, GPay, Paytm) ತೋರಿಸುವ ಸ್ವೀಕೃತದಾರರ ಹೆಸರನ್ನು ಯಾವಾಗಲೂ ಪರಿಶೀಲಿಸಿ.",
-        "ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ, ವಿದ್ಯುತ್ ಬಿಲ್ ಅಥವಾ ಫೋನ್ ಸೇವೆ ಅವಧಿ ಮುಗಿಯುತ್ತಿದೆ ಎಂದು ಹೇಳಿ ಯಾರಾದರೂ ತುರ್ತು ಒತ್ತಡ ಹೇರಿದ್ದರೆ, ಹಣ ಪಾವತಿಸಬೇಡಿ."
+        "ಪಾವತಿ ಮಾಡುವ ಮೊದಲು ನಿಮ್ಮ ಆ್ಯಪ್‌ನಲ್ಲಿ ತೋರಿಸುವ ಸ್ವೀಕೃತದಾರರ ಹೆಸರನ್ನು ಯಾವಾಗಲೂ ಪರಿಶೀಲಿಸಿ."
+      ]
+    };
+  };
+
+  const getLocalQrAnalysis = (qr) => {
+    const q = qr.trim().toLowerCase();
+    if (q.startsWith("upi://pay")) {
+      const paMatch = q.match(/pa=([^&]+)/);
+      const pa = paMatch ? paMatch[1] : "";
+      return getLocalUpiAnalysis(pa);
+    }
+    if (q.includes("pmkisan") || q.includes("awas") || q.includes("relief")) {
+      return {
+        score: 96,
+        status: "danger",
+        category_en: "Phishing QR Link",
+        category_kn: "ನಕಲಿ ಜಾಲತಾಣ ಲಿಂಕ್ ಕ್ಯೂಆರ್",
+        message_en: "CRITICAL DANGER: Fraudulent QR Web Link Detected!",
+        message_kn: "ತೀವ್ರ ಅಪಾಯ: ಕ್ಯೂಆರ್ ಕೋಡ್‌ನಲ್ಲಿ ವಂಚನೆಯ ವೆಬ್ ಲಿಂಕ್ ಪತ್ತೆಯಾಗಿದೆ!",
+        details_en: [
+          "This QR code encodes a web address designed to mimic official government portals.",
+          "Scanning it opens a website that will ask you to login using your bank details or pay processing fees."
+        ],
+        details_kn: [
+          "ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಅಧಿಕೃತ ಸರ್ಕಾರಿ ವೆಬ್‌ಸೈಟ್‌ಗಳಂತೆ ನಕಲು ಮಾಡುವ ಜಾಲತಾಣ ಲಿಂಕ್ ಅನ್ನು ಹೊಂದಿದೆ.",
+          "ಇದನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದರಿಂದ ತೆರೆದುಕೊಳ್ಳುವ ವೆಬ್‌ಸೈಟ್ ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ವಿವರಗಳು ಅಥವಾ ಶುಲ್ಕಗಳನ್ನು ಕೇಳುತ್ತದೆ."
+        ],
+        steps_en: [
+          "1. Do NOT click or open the link on your phone.",
+          "2. Delete the QR code image immediately.",
+          "3. Warn others in your family not to scan this printed image."
+        ],
+        steps_kn: [
+          "1. ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಈ ಲಿಂಕ್ ಅನ್ನು ಓಪನ್ ಮಾಡಬೇಡಿ.",
+          "2. ತಕ್ಷಣವೇ ಈ ಕ್ಯೂಆರ್ ಕೋಡ್ ಚಿತ್ರವನ್ನು ಅಳಿಸಿಹಾಕಿ.",
+          "3. ಈ ಮುದ್ರಿತ ಚಿತ್ರವನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡದಂತೆ ನಿಮ್ಮ ಮನೆಯ ಇತರರಿಗೂ ತಿಳಿಸಿ."
+        ]
+      };
+    }
+    return {
+      score: 50,
+      status: "caution",
+      message_en: "CAUTION: Unverified QR Link or Text.",
+      message_kn: "ಎಚ್ಚರಿಕೆ: ಪರಿಶೀಲಿಸದ ಕ್ಯೂಆರ್ ಪಠ್ಯ ಮಾಹಿತಿ.",
+      details_en: [
+        "Ensure you trust the sender before completing payments or entering links."
+      ],
+      details_kn: [
+        "ಯಾವುದೇ ಲಿಂಕ್ ತೆರೆಯುವ ಮುನ್ನ ಕಳುಹಿಸಿದವರನ್ನು ನೀವು ನಂಬುತ್ತೀರಿ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
       ]
     };
   };
@@ -321,20 +835,30 @@ export default function App() {
       return {
         score: 98,
         status: "danger",
+        category_en: "Government Subsidy Scam",
+        category_kn: "ಸರ್ಕಾರಿ ಸವಲತ್ತು ಯೋಜನೆ ವಂಚನೆ",
         message_en: "CRITICAL DANGER: Fake Government Subsidy & Phishing Scam Detected!",
         message_kn: "ತೀವ್ರ ಅಪಾಯ: ನಕಲಿ ಸರ್ಕಾರಿ ಸಹಾಯಧನ ಮತ್ತು ವಂಚನೆಯ ಸಂದೇಶ ಪತ್ತೆಯಾಗಿದೆ!",
         details_en: [
           "This message asks for an upfront 'processing fee' or 'registration fee' to claim the government 'PM Awas Yojana' housing subsidy.",
-          "FACT: The Government of India never asks for any upfront fees, processing charges, or UPI transfers to approve PM Awas Yojana or any other scheme.",
-          "This is a classic 'advance-fee fraud' designed to steal money from rural citizens seeking government support."
+          "FACT: The Government of India never asks for any upfront fees, processing charges, or UPI transfers to approve PM Awas Yojana.",
+          "This is a classic 'advance-fee fraud' designed to steal money."
         ],
         details_kn: [
-          "ಈ ಸಂದೇಶವು ಸರ್ಕಾರಿ 'ಪಿಎಂ ಆವಾಸ್ ಯೋಜನೆ' ವಸತಿ ಸಹಾಯಧನವನ್ನು ಪಡೆಯಲು ಮುಂಗಡ 'ಸಂಸ್ಕಾರ ಶುಲ್ಕ' (processing fee) ಅಥವಾ 'ನೋಂದಣಿ ಶುಲ್ಕ' ಕೇಳುತ್ತಿದೆ.",
-          "ಸತ್ಯ: ಭಾರತ ಸರ್ಕಾರವು ಪಿಎಂ ಆವಾಸ್ ಯೋಜನೆ ಅಥವಾ ಯಾವುದೇ ಇತರ ಯೋಜನೆಯನ್ನು ಅನುಮೋದಿಸಲು ಯಾವುದೇ ಮುಂಗಡ ಶುಲ್ಕ ಅಥವಾ ಯುಪಿಐ ವರ್ಗಾವಣೆಗಳನ್ನು ಎಂದಿಗೂ ಕೇಳುವುದಿಲ್ಲ.",
+          "ಈ ಸಂದೇಶವು ಸರ್ಕಾರಿ 'ಪಿಎಂ ಆವಾಸ್ ಯೋಜನೆ' ವಸತಿ ಸಹಾಯಧನವನ್ನು ಪಡೆಯಲು ಮುಂಗಡ 'ಸಂಸ್ಕಾರ ಶುಲ್ಕ' ಕೇಳುತ್ತಿದೆ.",
+          "ಸತ್ಯ: ಭಾರತ ಸರ್ಕಾರವು ಪಿಎಂ ಆವಾಸ್ ಯೋಜನೆಯನ್ನು ಅನುಮೋದಿಸಲು ಯಾವುದೇ ಮುಂಗಡ ಶುಲ್ಕಗಳನ್ನು ಕೇಳುವುದಿಲ್ಲ.",
           "ಇದು ಸರ್ಕಾರಿ ಸಹಾಯ ಪಡೆಯಲು ಬಯಸುವ ಗ್ರಾಮೀಣ ಜನರಿಂದ ಹಣವನ್ನು ದೋಚಲು ರೂಪಿಸಿದ ವಂಚನೆಯಾಗಿದೆ."
         ],
-        tip_en: "⚠️ Do NOT pay any processing fee. Delete this message immediately. Tell your family members that official schemes are only applied through authorized Gram Panchayat offices, never over WhatsApp.",
-        tip_kn: "⚠️ ಯಾವುದೇ ಶುಲ್ಕವನ್ನು ಪಾವತಿಸಬೇಡಿ. ಈ ಸಂದೇಶವನ್ನು ತಕ್ಷಣವೇ ಅಳಿಸಿ. ಅಧಿಕೃತ ಯೋಜನೆಗಳಿಗೆ ಗ್ರಾಮ್ ಪಂಚಾಯತ್ ಕಚೇರಿಗಳ ಮೂಲಕ ಮಾತ್ರ ಅರ್ಜಿ ಸಲ್ಲಿಸಲಾಗುತ್ತದೆ, ವಾಟ್ಸಾಪ್ ಮೂಲಕ ಅಲ್ಲ ಎಂಬುದನ್ನು ನಿಮ್ಮ ಕುಟುಂಬದವರಿಗೆ ತಿಳಿಸಿ."
+        steps_en: [
+          "1. Do NOT pay any processing fee or registration fee.",
+          "2. Delete this WhatsApp forward and warn your family members immediately.",
+          "3. File a complaint on the official portal cybercrime.gov.in."
+        ],
+        steps_kn: [
+          "1. ಯಾವುದೇ ಸಂಸ್ಕರಣಾ ಶುಲ್ಕ ಅಥವಾ ಮುಂಗಡ ಹಣವನ್ನು ಪಾವತಿಸಬೇಡಿ.",
+          "2. ಈ ವಾಟ್ಸಾಪ್ ಸಂದೇಶವನ್ನು ತಕ್ಷಣ ಅಳಿಸಿ ಮತ್ತು ನಿಮ್ಮ ಕುಟುಂಬದವರನ್ನು ಎಚ್ಚರಿಸಿ.",
+          "3. ಅಧಿಕೃತ ಪೋರ್ಟಲ್ cybercrime.gov.in ನಲ್ಲಿ ದೂರು ದಾಖಲಿಸಿ."
+        ]
       };
     }
 
@@ -343,63 +867,28 @@ export default function App() {
       return {
         score: 92,
         status: "danger",
+        category_en: "KYC / Block Threat",
+        category_kn: "ಕೆವೈಸಿ / ಬ್ಲಾಕ್ ಬೆದರಿಕೆ",
         message_en: "HIGH RISK: Urgent Account Block / Service Suspension Scam!",
         message_kn: "ಹೆಚ್ಚಿನ ಅಪಾಯ: ಖಾತೆ ಬ್ಲಾಕ್ ಅಥವಾ ವಿದ್ಯುತ್ ಸ್ಥಗಿತದ ಸುಳ್ಳು ಬೆದರಿಕೆ!",
         details_en: [
-          "The message uses 'Urgency Tactics' threatening that your bank account, SIM card, or electricity service will be blocked TONIGHT if you don't call a number or click a link.",
-          "Banks or Electricity Boards (like BESCOM/HESCOM) never send simple WhatsApp messages with personal phone numbers for urgent payment or KYC updating.",
-          "Scammers use fear to make you pay or share your banking OTP/Password."
+          "The message uses 'Urgency Tactics' threatening SIM card or electricity service block TONIGHT.",
+          "Banks or Electricity Boards never send simple WhatsApp messages with personal phone numbers."
         ],
         details_kn: [
-          "ನೀವು ತಕ್ಷಣ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡದಿದ್ದರೆ ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ, ಸಿಮ್ ಕಾರ್ಡ್ ಅಥವಾ ವಿದ್ಯುತ್ ಸಂಪರ್ಕ ಇಂದು ರಾತ್ರಿಯೇ ಕಡಿತಗೊಳ್ಳುತ್ತದೆ ಎಂದು ಹೆದರಿಸುವ 'ತುರ್ತು ಒತ್ತಡದ ತಂತ್ರ' ಬಳಸಲಾಗಿದೆ.",
-          "ಬ್ಯಾಂಕುಗಳು ಅಥವಾ ವಿದ್ಯುತ್ ಮಂಡಳಿಗಳು (BESCOM/HESCOM ನಂತಹವು) ತುರ್ತು ಪಾವತಿ ಅಥವಾ KYC ಗಾಗಿ ವೈಯಕ್ತಿಕ ಫೋನ್ ಸಂಖ್ಯೆಗಳೊಂದಿಗೆ ಸಾಮಾನ್ಯ ವಾಟ್ಸಾಪ್ ಸಂದೇಶಗಳನ್ನು ಕಳುಹಿಸುವುದಿಲ್ಲ.",
-          "ವಂಚಕರು ನಿಮ್ಮಲ್ಲಿ ಭಯ ಹುಟ್ಟಿಸಿ ನಿಮ್ಮ ಬ್ಯಾಂಕಿಂಗ್ ಒಟಿಪಿ (OTP) ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಕದಿಯಲು ಈ ರೀತಿ ಮಾಡುತ್ತಾರೆ."
+          "ನೀವು ತಕ್ಷಣ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡದಿದ್ದರೆ ವಿದ್ಯುತ್ ಸಂಪರ್ಕ ಇಂದು ರಾತ್ರಿಯೇ ಕಡಿತಗೊಳ್ಳುತ್ತದೆ ಎಂದು ಬೆದರಿಸುವ ತಂತ್ರ ಬಳಸಲಾಗಿದೆ.",
+          "ಬ್ಯಾಂಕುಗಳು ಅಥವಾ ಇಲಾಖೆಗಳು ವೈಯಕ್ತಿಕ ಫೋನ್ ಸಂಖ್ಯೆಗಳೊಂದಿಗೆ ಸಾಮಾನ್ಯ ವಾಟ್ಸಾಪ್ ಸಂದೇಶಗಳನ್ನು ಕಳುಹಿಸುವುದಿಲ್ಲ."
         ],
-        tip_en: "⚠️ Never click the link. Never call the personal phone number mentioned in the message. Go to your local bank branch or electricity office directly to verify.",
-        tip_kn: "⚠️ ಸಂದೇಶದಲ್ಲಿರುವ ಲಿಂಕ್ ಅನ್ನು ಎಂದಿಗೂ ಕ್ಲಿಕ್ ಮಾಡಬೇಡಿ. ಅದರಲ್ಲಿರುವ ವೈಯಕ್ತಿಕ ಫೋನ್ ಸಂಖ್ಯೆಗೆ ಕರೆ ಮಾಡಬೇಡಿ. ಪರಿಶೀಲಿಸಲು ನೇರವಾಗಿ ನಿಮ್ಮ ಸ್ಥಳೀಯ ಬ್ಯಾಂಕ್ ಶಾಖೆ ಅಥವಾ ವಿದ್ಯುತ್ ಕಚೇರಿಗೆ ಹೋಗಿ."
-      };
-    }
-
-    const job_keywords = ["part time", "earn rs", "work from home", "youtube like", "earn daily", "telegram task"];
-    if (job_keywords.some(j => m.includes(j)) || (m.includes("earn") && m.includes("rs"))) {
-      return {
-        score: 89,
-        status: "danger",
-        message_en: "HIGH RISK: Part-Time Job / Quick Money Scam!",
-        message_kn: "ಹೆಚ್ಚಿನ ಅಪಾಯ: ಪಾರ್ಟ್-ಟೈಮ್ ಕೆಲಸ ಅಥವಾ ಸುಲಭವಾಗಿ ಹಣ ಗಳಿಸುವ ಸುಳ್ಳು ಆಮಿಷ!",
-        details_en: [
-          "Offers high payment (₹2,000 to ₹10,000 daily) for simple tasks like liking YouTube videos or review ratings.",
-          "This is a 'Task Scam'. They will pay you a small amount first to build trust, then ask you to deposit thousands of rupees for 'VIP tasks' and steal all your money.",
-          "Remember: No one gives high daily salaries for doing trivial online clicks."
+        steps_en: [
+          "1. Do NOT click the link or call the personal phone number.",
+          "2. Visit your local bank branch or electricity office directly to verify.",
+          "3. Block the sender immediately."
         ],
-        details_kn: [
-          "ಯೂಟ್ಯೂಬ್ ವೀಡಿಯೊಗಳನ್ನು ಲೈಕ್ ಮಾಡಲು ದಿನಕ್ಕೆ ₹೨,೦೦೦ ದಿಂದ ₹೧ಣ,೦೦೦ ರವರೆಗೆ ಸುಲಭವಾಗಿ ಹಣ ಗಳಿಸುವ ಆಮಿಷವನ್ನು ಇದು ತೋರಿಸುತ್ತದೆ.",
-          "ಇದು 'ಟಾಸ್ಕ್ ವಂಚನೆ' ಆಗಿದೆ. ಅವರು ಮೊದಲು ನಂಬಿಕೆ ಮೂಡಿಸಲು ಸಣ್ಣ ಮೊತ್ತವನ್ನು ನೀಡುತ್ತಾರೆ, ನಂತರ 'ವಿಐಪಿ ಟಾಸ್ಕ್' ಗಾಗಿ ಸಾವಿರಾರು ರೂಪಾಯಿ ಡೆಪಾಸಿಟ್ ಮಾಡಲು ಕೇಳಿ ನಿಮ್ಮ ಹಣವನ್ನು ದೋಚುತ್ತಾರೆ.",
-          "ನೆನಪಿಡಿ: ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಕೇವಲ ಕ್ಲಿಕ್ ಮಾಡುವುದಕ್ಕೆ ಯಾರೂ ಇಷ್ಟು ಹೆಚ್ಚಿನ ದಿನಗೂಲಿ lifestyle ನೀಡುವುದಿಲ್ಲ."
-        ],
-        tip_en: "⚠️ Ignore and block this number. Do not send any money or display your personal documents to these agencies.",
-        tip_kn: "⚠️ ಈ ಸಂಖ್ಯೆಯನ್ನು ನಿರ್ಲಕ್ಷಿಸಿ ಮತ್ತು ಬ್ಲಾಕ್ ಮಾಡಿ. ಈ ಏಜೆನ್ಸಿಗಳಿಗೆ ಯಾವುದೇ ಹಣವನ್ನು ಕಳುಹಿಸಬೇಡಿ ಅಥವಾ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ದಾಖಲೆಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಬೇಡಿ."
-      };
-    }
-
-    if (m.includes("http://") || m.includes("https://") || m.includes(".com") || m.includes(".info") || m.includes(".xyz")) {
-      return {
-        score: 75,
-        status: "caution",
-        message_en: "CAUTION: Unverified Web Link / Website URL Detected.",
-        message_kn: "ಎಚ್ಚರಿಕೆ: ಪರಿಶೀಲಿಸದ ವೆಬ್ ಲಿಂಕ್ ಪತ್ತೆಯಾಗಿದೆ.",
-        details_en: [
-          "The message contains a link that will open an external website.",
-          "Scammers create fake websites that look exactly like Google Pay, PhonePe, or government offices to steal your PIN or bank details.",
-          "Avoid clicking links sent by unknown people."
-        ],
-        details_kn: [
-          "ಸಂದೇಶವು ಬಾಹ್ಯ ವೆಬ್‌ಸೈಟ್ ಅನ್ನು ತೆರೆಯುವ ಲಿಂಕ್ ಅನ್ನು ಒಳಗೊಂಡಿದೆ.",
-          "ವಂಚಕರು ನಿಮ್ಮ ಪಿನ್ ಅಥವಾ ಬ್ಯಾಂಕ್ ವಿವರಗಳನ್ನು ಕದಿಯಲು ಗೂಗಲ್ ಪೇ, ಫೋನ್‌ಪೇ ಅಥವಾ ಸರ್ಕಾರಿ ಕಚೇರಿಗಳಂತೆಯೇ ಕಾಣುವ ನಕಲಿ ವೆಬ್‌ಸೈಟ್‌ಗಳನ್ನು ರಚಿಸುತ್ತಾರೆ.",
-          "ಅಪರಿಚಿತ ವ್ಯಕ್ತಿಗಳು ಕಳುಹಿಸಿದ ಲಿಂಕ್‌ಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡುವುದನ್ನು ತಪ್ಪಿಸಿ."
-        ],
-        tip_en: "⚠️ Check if the URL matches the official brand website (e.g. '.gov.in' for official Indian government, not '.info' or '.cc'). If in doubt, do not open.",
-        tip_kn: "⚠️ ವೆಬ್‌ಸೈಟ್ ವಿಳಾಸವು ಅಧಿಕೃತ ಬ್ರ್ಯಾಂಡ್ ವೆಬ್‌ಸೈಟ್‌ಗೆ ಹೊಂದಿಕೆಯಾಗುತ್ತದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ (ಉದಾಹರಣೆಗೆ ಅಧಿಕೃತ ಭಾರತ ಸರ್ಕಾರಕ್ಕೆ '.gov.in' ಇರಬೇಕು, '.info' ಅಥವಾ '.cc' ಅಲ್ಲ). ಸಂದೇಹವಿದ್ದರೆ ಲಿಂಕ್ ಓಪನ್ ಮಾಡಬೇಡಿ."
+        steps_kn: [
+          "1. ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಬೇಡಿ ಅಥವಾ ಅದರಲ್ಲಿರುವ ಸಂಖ್ಯೆಗೆ ಕರೆ ಮಾಡಬೇಡಿ.",
+          "2. ನೇರವಾಗಿ ನಿಮ್ಮ ಸ್ಥಳೀಯ ಬ್ಯಾಂಕ್ ಶಾಖೆ ಅಥವಾ ವಿದ್ಯುತ್ ಕಚೇರಿಗೆ ಹೋಗಿ ಪರಿಶೀಲಿಸಿ.",
+          "3. ತಕ್ಷಣವೇ ಕಳುಹಿಸಿದವರನ್ನು ಬ್ಲಾಕ್ ಮಾಡಿ."
+        ]
       };
     }
 
@@ -409,17 +898,117 @@ export default function App() {
       message_en: "CAUTION: Unverified message. Be cautious of forward forwards.",
       message_kn: "ಎಚ್ಚರಿಕೆ: ಪರಿಶೀಲಿಸದ ಸಂದೇಶ. ಮುನ್ನೆಚ್ಚರಿಕೆ ವಹಿಸಿ.",
       details_en: [
-        "This message does not match known threat patterns directly, but remains unverified.",
-        "First-time internet users are often tricked by WhatsApp forward messages containing fake news or false claims.",
-        "Always consult a tech-savvy child, friend, or relative before taking action on forwarded messages."
+        "This message does not match known threat patterns directly, but remains unverified."
       ],
       details_kn: [
-        "ಈ ಸಂದೇಶವು ನೇರವಾಗಿ ತಿಳಿದಿರುವ ಅಪಾಯದ ಮಾದರಿಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುವುದಿಲ್ಲ, ಆದರೆ ಇದು ಇನ್ನೂ ಪರಿಶೀಲಿಸಲ್ಪಟ್ಟಿಲ್ಲ.",
-        "ಗ್ರಾಮೀಣ ಭಾಗದ ಮುಗ್ಧ ಬಳಕೆದಾರರು ಹೆಚ್ಚಾಗಿ ಸುಳ್ಳು ಸುದ್ದಿ ಅಥವಾ ನಕಲಿ ಮಾಹಿತಿ ಹೊಂದಿರುವ ವಾಟ್ಸಾಪ್ ಫಾರ್ವರ್ಡ್ ಸಂದೇಶಗಳಿಂದ ಮೋಸಹೋಗುತ್ತಾರೆ.",
-        "ಫಾರ್ವರ್ಡ್ ಮಾಡಿದ ಸಂದೇಶಗಳ ಮೇಲೆ ಯಾವುದೇ ಕ್ರಮ ತೆಗೆದುಕೊಳ್ಳುವ ಮೊದಲು ಯಾವಾಗಲೂ ಮನೆಯಲ್ಲಿರುವ ವಿದ್ಯಾವಂತ ಮಕ್ಕಳನ್ನು ಅಥವಾ ವಿಶ್ವಾಸಾರ್ಹ ಸ್ನೇಹಿತರನ್ನು ಸಂಪರ್ಕಿಸಿ."
+        "ಈ ಸಂದೇಶವು ನೇರವಾಗಿ ತಿಳಿದಿರುವ ಅಪಾಯದ ಮಾದರಿಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುವುದಿಲ್ಲ."
+      ]
+    };
+  };
+
+  const getLocalOtpAnalysis = (otp) => {
+    const o = otp.trim().toLowerCase();
+    const otp_words = ["otp", "one time password", "verification", "code", "ಕೋಡ್", "ಒಟಿಪಿ", "ಪಿನ್", "pin", "ಪಾಸ್ವರ್ಡ್", "password"];
+    
+    if (otp_words.some(w => o.includes(w))) {
+      return {
+        score: 97,
+        status: "danger",
+        category_en: "OTP & Credential Fraud",
+        category_kn: "ಒಟಿಪಿ ಮತ್ತು ವಿವರ ಕದಿಯುವ ವಂಚನೆ",
+        message_en: "CRITICAL ALERT: OTP / Password Stealing Scam Detected!",
+        message_kn: "ತೀವ್ರ ಎಚ್ಚರಿಕೆ: ಒಟಿಪಿ ಅಥವಾ ರಹಸ್ಯ ಪಿನ್ ಕದಿಯುವ ವಂಚನೆ ಪತ್ತೆಯಾಗಿದೆ!",
+        details_en: [
+          "The message asks you to share your OTP, secret banking PIN, or password.",
+          "CRITICAL FACT: Official bank employees, police, or customer care will NEVER ask you for an OTP under any circumstances.",
+          "Sharing OTP gives scammers complete access to empty your bank account instantly."
+        ],
+        details_kn: [
+          "ಸಂದೇಶವು ನಿಮ್ಮ ಒಟಿಪಿ (OTP), ರಹಸ್ಯ ಬ್ಯಾಂಕಿಂಗ್ ಪಿನ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಹಂಚಿಕೊಳ್ಳಲು ಕೇಳುತ್ತಿದೆ.",
+          "ಪ್ರಮುಖ ಸತ್ಯ: ಅಧಿಕೃತ ಬ್ಯಾಂಕ್ ಸಿಬ್ಬಂದಿ ಅಥವಾ ಗ್ರಾಹಕ ಸೇವೆಯವರು ನಿಮ್ಮ ಒಟಿಪಿ ಸಂಖ್ಯೆಯನ್ನು ಎಂದಿಗೂ ಕೇಳುವುದಿಲ್ಲ.",
+          "ವಂಚಕರು ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆಯಿಂದ ತಕ್ಷಣ ಹಣ ದೋಚಲು ಒಟಿಪಿ ಕೇಳುತ್ತಾರೆ."
+        ],
+        steps_en: [
+          "1. NEVER share this 4-digit or 6-digit code with anyone, even on phone calls.",
+          "2. Hang up or ignore the message immediately. Block the number.",
+          "3. If already shared, call your bank customer service immediately to lock your card and accounts."
+        ],
+        steps_kn: [
+          "1. ಅವರು ಯಾರೇ ಎಂದು ಹೇಳಿಕೊಂಡರೂ ೪ ಅಥವಾ ೬ ಅಂಕಿಯ ಒಟಿಪಿ ಕೋಡ್ ಅನ್ನು ಯಾರೊಂದಿಗೂ ಹಂಚಿಕೊಳ್ಳಬೇಡಿ.",
+          "2. ತಕ್ಷಣ ಫೋನ್ ಕಟ್ ಮಾಡಿ ಅಥವಾ ಸಂದೇಶವನ್ನು ಬ್ಲಾಕ್ ಮಾಡಿ.",
+          "3. ಈಗಾಗಲೇ ಹಂಚಿಕೊಂಡಿದ್ದರೆ, ತಕ್ಷಣ ಬ್ಯಾಂಕ್‌ಗೆ ಕರೆ ಮಾಡಿ ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಬ್ಲಾಕ್ ಮಾಡಿಸಿ."
+        ]
+      };
+    }
+    return {
+      score: 40,
+      status: "caution",
+      message_en: "CAUTION: Suspicious text block. Never share verification codes.",
+      message_kn: "ಎಚ್ಚರಿಕೆ: ಶಂಕಾಸ್ಪದ ಸಂದೇಶ. ರಹಸ್ಯ ಸಂಖ್ಯೆಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಬೇಡಿ.",
+      details_en: [
+        "This text contains a security warning request. Keep all verification details private."
       ],
-      tip_en: "⚠️ Do not forward this message further until you are 100% sure of its truthfulness.",
-      tip_kn: "⚠️ ಈ ಸಂದೇಶದ ಸತ್ಯಾಸತ್ಯತೆ ನಿಮಗೆ ೧೦೦% ಖಚಿತವಾಗುವವರೆಗೆ ಇದನ್ನು ಇತರರಿಗೆ ಫಾರ್ವರ್ಡ್ ಮಾಡಬೇಡಿ."
+      details_kn: [
+        "ಈ ಸಂದೇಶವು ಭದ್ರತಾ ವಿನಂತಿಯನ್ನು ಹೊಂದಿರಬಹುದು. ರಹಸ್ಯ ವಿವರಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿರಿಸಿ."
+      ]
+    };
+  };
+
+  const getLocalLoanAnalysis = (loan) => {
+    const l = loan.trim().toLowerCase();
+    const predatory = ["cashexpress", "quickloan", "fastrupee", "instacash", "easyloan", "rupeeplus", "speedloan", "pocketmoney", "loan", "rupee"];
+    
+    if (predatory.some(k => l.includes(k))) {
+      return {
+        score: 96,
+        status: "danger",
+        category_en: "Predatory Loan App Scam",
+        category_kn: "ಕಾನೂನುಬಾಹಿರ ಲೂಟಿ ಸಾಲದ ಆಪ್ ವಂಚನೆ",
+        message_en: "CRITICAL WARNING: High-Risk Predatory / Illegal Lending App Detected!",
+        message_kn: "ತೀವ್ರ ಎಚ್ಚರಿಕೆ: ಹೆಚ್ಚಿನ ಅಪಾಯದ ಕಾನೂನುಬಾಹಿರ ಕಬಳಿಸುವ ಸಾಲದ ಆಪ್ ಪತ್ತೆಯಾಗಿದೆ!",
+        details_en: [
+          "This loan app operates illegally and is not registered with the Reserve Bank of India (RBI).",
+          "Predatory loan apps charge extremely high interest rates (weekly double rates) and levy hidden charges.",
+          "Crucially: These apps steal your private phone contacts and photos to blackmail and harass your family members."
+        ],
+        details_kn: [
+          "ಈ ಸಾಲದ ಆಪ್ ಕಾನೂನುಬಾಹಿರವಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ ಮತ್ತು ಆರ್‌ಬಿಐ (RBI) ನಲ್ಲಿ ನೋಂದಾಯಿಸಲ್ಪಟ್ಟಿಲ್ಲ.",
+          "ಇವುಗಳು ಅತ್ಯಂತ ಹೆಚ್ಚಿನ ಕಾನೂನುಬಾಹಿರ ಬಡ್ಡಿದರಗಳನ್ನು ವಿಧಿಸುತ್ತವೆ (ಸಾಮಾನ್ಯವಾಗಿ ೭ ದಿನಗಳಲ್ಲಿ ದುಪ್ಪಟ್ಟು).",
+          "ಮುಖ್ಯವಾಗಿ: ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡುವಾಗ ಇವು ನಿಮ್ಮ ಸಂಪರ್ಕ ಪಟ್ಟಿ ಕದ್ದು, ನಂತರ ಬ್ಲಾಕ್‌ಮೇಲ್ ಮಾಡಲು ಕುಟುಂಬದವರಿಗೆ ಹೆದರಿಸಿ ಬೆದರಿಸುತ್ತವೆ."
+        ],
+        steps_en: [
+          "1. Do NOT download or install this app from any store or link.",
+          "2. If installed, immediately uninstall it, backup your phone, and perform a factory reset.",
+          "3. Alert your phone contacts that your details were compromised by a fraud app."
+        ],
+        steps_kn: [
+          "1. ಯಾವುದೇ ಆಪ್ ಸ್ಟೋರ್‌ನಿಂದ ಈ ಆ್ಯಪ್ ಅನ್ನು ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಬೇಡಿ.",
+          "2. ಈಗಾಗಲೇ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿದ್ದರೆ, ತಕ್ಷಣ ಅನ್‌ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ, ಫೋನ್ ರಿಸೆಟ್ ಮಾಡಿ.",
+          "3. ಈ ಆ್ಯಪ್‌ನಿಂದ ನಿಮ್ಮ ಸಂಪರ್ಕ ವಿವರ ಸೋರಿಕೆಯಾಗಿದೆ ಎಂದು ನಿಮ್ಮ ಪಟ್ಟಿಯಲ್ಲಿರುವವರಿಗೆ ಎಚ್ಚರಿಸಿ."
+        ],
+        alternatives_en: [
+          "PM-SVANidhi Scheme: Official government zero-collateral loan up to ₹10,000 for street vendors.",
+          "Mudra Loans: Official micro-business financing scheme via public banks (SBI, Canara Bank).",
+          "Local Cooperative Credit Society: Registered local cooperative credit society with fair interest."
+        ],
+        alternatives_kn: [
+          "ಪಿಎಂ-ಸ್ವನಿಧಿ ಯೋಜನೆ: ಸಣ್ಣ ಬೀದಿ ವ್ಯಾಪಾರಿಗಳಿಗಾಗಿ ಸರ್ಕಾರದ ಶೂನ್ಯ-ಜಾಮೀನು ₹೧೦,೦೦೦ ರವರೆಗಿನ ಅಧಿಕೃತ ಸಾಲ.",
+          "ಮುದ್ರಾ ಸಾಲ: ಸಾರ್ವಜನಿಕ ಬ್ಯಾಂಕ್‌ಗಳ ಮೂಲಕ ಅಧಿಕೃತ ಕಿರು ವ್ಯವಹಾರ ಧನಸಹಾಯ ಯೋಜನೆ (SBI, Canara Bank).",
+          "ಸ್ಥಳೀಯ ಸಹಕಾರಿ ಪತ್ತಿನ ಸಂಘ: ನೋಂದಾಯಿತ ಸ್ಥಳೀಯ ಸಹಕಾರಿ ಪತ್ತಿನ ಸಂಘದ ಸಾಲಗಳು."
+        ]
+      };
+    }
+    return {
+      score: 40,
+      status: "caution",
+      message_en: "CAUTION: Unverified App. Verify RBI NBFC registration before borrowing.",
+      message_kn: "ಎಚ್ಚರಿಕೆ: ಪರಿಶೀಲಿಸದ ಸಾಲದ ಸಂಸ್ಥೆ. ನೋಂದಣಿ ದೃಢೀಕರಿಸಿ.",
+      details_en: [
+        "Always verify that the lending app is officially partnered with an RBI registered NBFC before uploading ID documents."
+      ],
+      details_kn: [
+        "ನಿಮ್ಮ ದಾಖಲೆಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡುವ ಮೊದಲು ಸಾಲ ನೀಡುವ ಆಪ್ ಆರ್‌ಬಿಐ ನೋಂದಾಯಿತ ಎನ್‌ಬಿಎಫ್‌ಸಿ ಜೊತೆ ಪಾಲುದಾರಿಕೆ ಹೊಂದಿದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ."
+      ]
     };
   };
 
@@ -428,8 +1017,8 @@ export default function App() {
   // -------------------------------------------------------------
   const handleCheckUpi = async (e, directVal = null) => {
     if (e) e.preventDefault();
-    const upiVal = directVal !== null ? directVal : upiInput;
-    if (!upiVal.trim()) return;
+    const val = directVal !== null ? directVal : upiInput;
+    if (!val.trim()) return;
 
     setUpiLoading(true);
     setUpiResult(null);
@@ -439,26 +1028,51 @@ export default function App() {
       const response = await fetch('http://localhost:5000/api/analyze-upi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ upi: upiVal })
+        body: JSON.stringify({ upi: val, user_id: user?.id })
       });
-      if (!response.ok) throw new Error("Server error");
+      if (!response.ok) throw new Error("Offline");
       const data = await response.json();
       setUpiResult(data);
     } catch (err) {
-      console.warn("Backend unavailable, using client-side smart rules:", err);
-      // Perfect graceful fallback
-      setTimeout(() => {
-        setUpiResult(getLocalUpiAnalysis(upiVal));
-      }, 600);
+      console.warn("Using local rules:", err);
+      setTimeout(() => setUpiResult(getLocalUpiAnalysis(val)), 500);
     } finally {
       setUpiLoading(false);
+      setTimeout(() => fetchRecentScans(user?.id), 800);
     }
   };
 
+  async function handleCheckQr(e, directVal = null) {
+    if (e) e.preventDefault();
+    const val = directVal !== null ? directVal : qrInput;
+    if (!val.trim()) return;
+
+    setQrLoading(true);
+    setQrResult(null);
+    stopAudio();
+
+    try {
+      const response = await fetch('http://localhost:5000/api/analyze-qr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qr: val, user_id: user?.id })
+      });
+      if (!response.ok) throw new Error("Offline");
+      const data = await response.json();
+      setQrResult(data);
+    } catch (err) {
+      console.warn("Using local rules:", err);
+      setTimeout(() => setQrResult(getLocalQrAnalysis(val)), 500);
+    } finally {
+      setQrLoading(false);
+      setTimeout(() => fetchRecentScans(user?.id), 800);
+    }
+  }
+
   const handleCheckMessage = async (e, directVal = null) => {
     if (e) e.preventDefault();
-    const msgVal = directVal !== null ? directVal : messageInput;
-    if (!msgVal.trim()) return;
+    const val = directVal !== null ? directVal : messageInput;
+    if (!val.trim()) return;
 
     setMessageLoading(true);
     setMessageResult(null);
@@ -468,20 +1082,90 @@ export default function App() {
       const response = await fetch('http://localhost:5000/api/analyze-message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msgVal })
+        body: JSON.stringify({ message: val, user_id: user?.id })
       });
-      if (!response.ok) throw new Error("Server error");
+      if (!response.ok) throw new Error("Offline");
       const data = await response.json();
       setMessageResult(data);
     } catch (err) {
-      console.warn("Backend unavailable, using client-side smart rules:", err);
-      // Perfect graceful fallback
-      setTimeout(() => {
-        setMessageResult(getLocalMessageAnalysis(msgVal));
-      }, 600);
+      console.warn("Using local rules:", err);
+      setTimeout(() => setMessageResult(getLocalMessageAnalysis(val)), 500);
     } finally {
       setMessageLoading(false);
+      setTimeout(() => fetchRecentScans(user?.id), 800);
     }
+  };
+
+  const handleCheckOtp = async (e, directVal = null) => {
+    if (e) e.preventDefault();
+    const val = directVal !== null ? directVal : otpInput;
+    if (!val.trim()) return;
+
+    setOtpLoading(true);
+    setOtpResult(null);
+    stopAudio();
+
+    try {
+      const response = await fetch('http://localhost:5000/api/analyze-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: val, user_id: user?.id })
+      });
+      if (!response.ok) throw new Error("Offline");
+      const data = await response.json();
+      setOtpResult(data);
+    } catch (err) {
+      console.warn("Using local rules:", err);
+      setTimeout(() => setOtpResult(getLocalOtpAnalysis(val)), 500);
+    } finally {
+      setOtpLoading(false);
+      setTimeout(() => fetchRecentScans(user?.id), 800);
+    }
+  };
+
+  const handleCheckLoan = async (e, directVal = null) => {
+    if (e) e.preventDefault();
+    const val = directVal !== null ? directVal : loanInput;
+    if (!val.trim()) return;
+
+    setLoanLoading(true);
+    setLoanResult(null);
+    stopAudio();
+
+    try {
+      const response = await fetch('http://localhost:5000/api/analyze-loan-app', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ app: val, user_id: user?.id })
+      });
+      if (!response.ok) throw new Error("Offline");
+      const data = await response.json();
+      setLoanResult(data);
+    } catch (err) {
+      console.warn("Using local rules:", err);
+      setTimeout(() => setLoanResult(getLocalLoanAnalysis(val)), 500);
+    } finally {
+      setLoanLoading(false);
+      setTimeout(() => fetchRecentScans(user?.id), 800);
+    }
+  };
+
+  // Mock File Upload Reader
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadedFileName(file.name);
+    const fname = file.name.toLowerCase();
+    
+    // Auto simulate qr text scan depending on filename
+    let simulatedText = "upi://pay?pa=merchant@icici&pn=VerifiedMerchant";
+    if (fname.includes("pmkisan") || fname.includes("scam") || fname.includes("relief") || fname.includes("awas")) {
+      simulatedText = "upi://pay?pa=pmkisan-relief@ybl&pn=PMKisanRelief";
+    }
+
+    setQrInput(simulatedText);
+    handleCheckQr(null, simulatedText);
   };
 
   const handleSimulatePayment = (e) => {
@@ -492,7 +1176,6 @@ export default function App() {
     setSimMessage('');
     
     if (amt > 5000) {
-      // Trigger Behavioral Safety Nudge Modal
       setConfirmChecks({
         knowPerson: false,
         noThreat: false,
@@ -507,51 +1190,495 @@ export default function App() {
   const handleConfirmNudge = () => {
     setShowNudgeModal(false);
     const msg = lang === 'en' 
-      ? `✅ Payment simulator approved: Transfer of ₹${simAmount} to ${simRecipient} successfully practiced! Always remember these safety checks.`
-      : `✅ ಪಾವತಿ ಅಭ್ಯಾಸ ಯಶಸ್ವಿಯಾಗಿದೆ: ${simRecipient} ಗೆ ₹${simAmount} ಕಳುಹಿಸುವ ಅಭ್ಯಾಸ ಯಶಸ್ವಿ! ಈ ರಕ್ಷಣಾ ನಿಯಮಗಳನ್ನು ಯಾವಾಗಲೂ ನೆನಪಿಡಿ.`;
+      ? `✅ Payment practice approved: Transfer of ₹${simAmount} to ${simRecipient} successfully simulated! Keep these safety rules in mind.`
+      : `✅ ಪಾವತಿ ಅಭ್ಯಾಸ ಯಶಸ್ವಿಯಾಗಿದೆ: ${simRecipient} ಗೆ ₹${simAmount} ಕಳುಹಿಸುವ ಪ್ರಾಯೋಗಿಕ ವರ್ಗಾವಣೆ ಯಶಸ್ವಿ! ಈ ರಕ್ಷಣಾ ನಿಯಮಗಳನ್ನು ನೆನಪಿಡಿ.`;
     setSimMessage(msg);
   };
 
-  // Helper for UI styling classes
+  const handlePayRedirect = (app) => {
+    const infoText = activeTranslations.upgrades.payTriggered.replace("[App]", app);
+    alert(infoText);
+  };
+
   const getStatusColorClasses = (status) => {
     switch (status) {
       case 'safe':
         return {
-          bg: 'bg-emerald-50 border-emerald-300 text-emerald-900',
+          bg: 'bg-emerald-50 border-emerald-300 text-emerald-950',
           badge: 'bg-emerald-500 text-white',
-          text: 'text-emerald-600',
+          text: 'text-emerald-700',
           accent: 'border-emerald-500',
           meter: 'bg-emerald-500'
         };
       case 'caution':
         return {
-          bg: 'bg-amber-50 border-amber-300 text-amber-900',
-          badge: 'bg-amber-500 text-white',
-          text: 'text-amber-600',
+          bg: 'bg-amber-50 border-amber-300 text-amber-950',
+          badge: 'bg-amber-500 text-slate-900',
+          text: 'text-amber-700',
           accent: 'border-amber-500',
           meter: 'bg-amber-500'
         };
       case 'danger':
-        default:
+      default:
         return {
-          bg: 'bg-rose-50 border-rose-300 text-rose-900',
+          bg: 'bg-rose-50 border-rose-300 text-rose-950',
           badge: 'bg-rose-500 text-white',
-          text: 'text-rose-600',
+          text: 'text-rose-700',
           accent: 'border-rose-500',
           meter: 'bg-rose-600'
         };
     }
   };
 
+  // Upgraded Result Card Component
+  const renderResultCard = (result, type, rawInput) => {
+    if (!result) return null;
+    const styles = getStatusColorClasses(result.status);
+    
+    // Auto populate steps if danger but backend didn't supply them
+    const steps = lang === 'en'
+      ? (result.steps_en || [
+          "1. Do NOT click any links or scan this QR again.",
+          "2. Delete the sender's message and block them immediately.",
+          "3. Warn family members not to trust this scheme."
+        ])
+      : (result.steps_kn || [
+          "1. ಯಾವುದೇ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಬೇಡಿ ಅಥವಾ ಕ್ಯೂಆರ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಬೇಡಿ.",
+          "2. ಕಳುಹಿಸಿದವರ ಸಂದೇಶವನ್ನು ಅಳಿಸಿ ತಕ್ಷಣವೇ ಬ್ಲಾಕ್ ಮಾಡಿ.",
+          "3. ಈ ಸುಳ್ಳು ಯೋಜನೆಯನ್ನು ನಂಬದಂತೆ ಕುಟುಂಬದವರಿಗೆ ಎಚ್ಚರಿಸಿ."
+        ]);
+
+    const displayCategory = lang === 'en' ? result.category_en : result.category_kn;
+    const alternatives = lang === 'en' ? result.alternatives_en : result.alternatives_kn;
+
+    return (
+      <div className={`mt-6 rounded-3xl p-5 border-2 ${styles.bg} shadow-lg space-y-6 transition-all duration-300`}>
+        
+        {/* Header Block */}
+        <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-6 pb-5 border-b border-black/10">
+          
+          {/* Speedometer Visualizer */}
+          <div className="flex flex-col items-center">
+            <div className="gauge-container">
+              <div className="gauge-body"></div>
+              <div 
+                className={`gauge-fill ${styles.meter}`}
+                style={{ transform: `rotate(${result.score * 1.8}deg)` }}
+              ></div>
+              <div className="gauge-cover">
+                <span className="text-2xl font-black text-slate-800">{result.score}</span>
+                <span className="text-xs font-bold text-slate-500 ml-0.5 mb-1">/100</span>
+              </div>
+            </div>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 mt-2">
+              {activeTranslations.upi.riskScore}
+            </span>
+          </div>
+
+          {/* Verdict Box */}
+          <div className="text-center sm:text-right flex flex-col items-center sm:items-end gap-2">
+            
+            {/* Scam Type Badge for RED alerts */}
+            {result.status === 'danger' && displayCategory && (
+              <span className="text-xs font-black uppercase tracking-widest text-rose-600 bg-rose-100 border border-rose-300 px-3 py-1 rounded-full animate-pulse">
+                {activeTranslations.upgrades.scamCategory} {displayCategory}
+              </span>
+            )}
+
+            <span className={`text-lg sm:text-xl font-black px-5 py-2 rounded-full ${styles.badge}`}>
+              {result.status === 'safe' && activeTranslations.upi.verdicts.safe}
+              {result.status === 'caution' && activeTranslations.upi.verdicts.caution}
+              {result.status === 'danger' && activeTranslations.upi.verdicts.danger}
+            </span>
+            
+            <p className="text-base sm:text-lg font-extrabold max-w-sm">
+              {lang === 'en' ? result.message_en : result.message_kn}
+            </p>
+          </div>
+        </div>
+
+        {/* Explainers list */}
+        <div className="space-y-3">
+          <h4 className="text-base font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <ShieldAlert className="w-5 h-5 text-slate-600" />
+            {activeTranslations.upi.warningTitle}
+          </h4>
+          <ul className="space-y-3.5 pl-2">
+            {(lang === 'en' ? result.details_en : result.details_kn).map((detail, idx) => (
+              <li key={idx} className="text-base sm:text-lg font-bold flex items-start gap-2.5">
+                <span className="text-emerald-600 text-lg mt-0.5">🔹</span>
+                <span>{detail}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Upgraded Feature 5: RED (Danger) Action Checklist and Report button */}
+        {result.status === 'danger' && (
+          <div className="space-y-4 pt-4 border-t border-black/10">
+            <div className="bg-rose-100/90 border border-rose-300 rounded-2xl p-4.5 space-y-3">
+              <h5 className="text-base sm:text-lg font-black text-rose-950 flex items-center gap-2">
+                <AlertOctagon className="w-6 h-6 text-rose-600 animate-bounce" />
+                {activeTranslations.upgrades.recoveryTitle}
+              </h5>
+              
+              <div className="grid grid-cols-1 gap-2.5 pl-1.5">
+                {steps.map((step, idx) => (
+                  <p key={idx} className="text-base sm:text-lg font-extrabold text-rose-900">
+                    {step}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            {/* Direct Official Reporting Portal Trigger */}
+            <button
+              onClick={() => {
+                handleReportScam(rawInput, displayCategory || "Scam Detected");
+                window.open("https://cybercrime.gov.in", "_blank");
+              }}
+              className="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 active:scale-95 transition-all text-white font-black py-4.5 rounded-2xl text-base sm:text-lg shadow-md border-2 border-red-500 flex items-center justify-center gap-2.5 cursor-pointer text-center"
+            >
+              <span>🚨</span>
+              <span>{activeTranslations.upgrades.reportLabel}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Upgraded Loan Alternatives Block */}
+        {type === 'loan' && alternatives && alternatives.length > 0 && (
+          <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-4.5 space-y-3 pt-4">
+            <h5 className="text-base sm:text-lg font-black text-emerald-950 flex items-center gap-2">
+              <LifeBuoy className="w-6 h-6 text-emerald-600" />
+              {activeTranslations.loan.altsLabel}
+            </h5>
+            <ul className="space-y-2.5 pl-2.5">
+              {alternatives.map((alt, idx) => (
+                <li key={idx} className="text-base font-extrabold text-emerald-900 flex items-start gap-2">
+                  <span className="text-emerald-600">🌿</span>
+                  <span>{alt}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Upgraded Feature 4: GREEN (Safe) official checkout launchers and PIN alert */}
+        {result.status === 'safe' && (
+          <div className="space-y-4 pt-4 border-t border-black/10">
+            <div className="bg-emerald-100/90 border border-emerald-300 rounded-2xl p-4.5 space-y-4">
+              <h5 className="text-base sm:text-lg font-black text-emerald-950 flex items-center gap-2">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                {activeTranslations.upgrades.safePayTitle}
+              </h5>
+              <p className="text-sm font-bold text-emerald-800">
+                {activeTranslations.upgrades.safePayMsg}
+              </p>
+
+              {/* Payment brand buttons row */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button
+                  onClick={() => handlePayRedirect('GPay')}
+                  className="bg-[#4285F4] hover:bg-[#357ae8] text-white font-black py-3.5 rounded-xl text-base shadow-sm border border-blue-400 transition-all active:scale-95 text-center cursor-pointer"
+                >
+                  Pay via GPay
+                </button>
+                <button
+                  onClick={() => handlePayRedirect('PhonePe')}
+                  className="bg-[#5f259f] hover:bg-[#4d1e82] text-white font-black py-3.5 rounded-xl text-base shadow-sm border border-purple-400 transition-all active:scale-95 text-center cursor-pointer"
+                >
+                  PhonePe
+                </button>
+                <button
+                  onClick={() => handlePayRedirect('Paytm')}
+                  className="bg-[#00baf2] hover:bg-[#009ed1] text-white font-black py-3.5 rounded-xl text-base shadow-sm border border-sky-400 transition-all active:scale-95 text-center cursor-pointer"
+                >
+                  Paytm
+                </button>
+                <button
+                  onClick={() => handlePayRedirect('BHIM UPI')}
+                  className="bg-[#e47911] hover:bg-[#cc6c0d] text-white font-black py-3.5 rounded-xl text-base shadow-sm border border-orange-400 transition-all active:scale-95 text-center cursor-pointer"
+                >
+                  BHIM UPI
+                </button>
+              </div>
+            </div>
+
+            {/* Verification critical warning banner */}
+            <div className="bg-amber-50 border-2 border-amber-400 rounded-2xl p-4.5">
+              <p className="text-base sm:text-lg font-black text-amber-950 leading-snug">
+                {activeTranslations.upgrades.verifyTip}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Text-To-Speech Speaker Button */}
+        <div className="pt-2 flex justify-center sm:justify-start">
+          {isPlayingAudio ? (
+            <button
+              onClick={stopAudio}
+              className="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold px-6 py-3 rounded-2xl text-base shadow-md border-2 border-slate-700 cursor-pointer"
+            >
+              <VolumeX className="w-6 h-6 animate-pulse text-rose-400" />
+              <span>{activeTranslations.upi.audioStop}</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                let speechText = lang === 'en'
+                  ? `${result.message_en}. reasons. ${result.details_en.join('. ')}`
+                  : `${result.message_kn}. ಕಾರಣಗಳು. ${result.details_kn.join('. ')}`;
+                
+                if (result.status === 'danger') {
+                  const safetyStepsSpeech = lang === 'en'
+                    ? `. Recovery action steps: ${steps.join('. ')}`
+                    : `. ತಕ್ಷಣ ನೀವು ಮಾಡಬೇಕಾದ ೩ ಕೆಲಸಗಳು: ${steps.join('. ')}`;
+                  speechText += safetyStepsSpeech;
+                }
+                
+                if (type === 'loan' && alternatives) {
+                  const alternativesSpeech = lang === 'en'
+                    ? `. Safer official alternatives: ${alternatives.join('. ')}`
+                    : `. ಸುರಕ್ಷಿತ ಅಧಿಕೃತ ಪರ್ಯಾಯಗಳು: ${alternatives.join('. ')}`;
+                  speechText += alternativesSpeech;
+                }
+
+                playTTS(speechText, lang);
+              }}
+              className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-95 text-slate-950 font-black px-6 py-3.5 rounded-2xl text-base sm:text-lg shadow-md border-2 border-amber-400 cursor-pointer"
+            >
+              <Volume2 className="w-6 h-6 text-slate-950 animate-bounce" />
+              <span>{activeTranslations.upi.audioBtn}</span>
+            </button>
+          )}
+        </div>
+
+      </div>
+    );
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-grid-pattern bg-[#fcfdfa] pb-12 flex flex-col font-sans">
+        {/* Dynamic Header */}
+        <header className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-800 text-white shadow-lg z-30">
+          <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/10 p-2 rounded-full safety-pulse">
+                <QrCode className="w-8 h-8 text-emerald-200" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-2">
+                  {activeTranslations.title}
+                </h1>
+                <p className="text-xs sm:text-sm text-emerald-100 font-medium">
+                  {activeTranslations.subtitle}
+                </p>
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => setLang(lang === 'en' ? 'kn' : 'en')}
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-95 transition-all text-slate-950 font-bold px-5 py-2.5 rounded-full text-base shadow-md border-2 border-amber-300 cursor-pointer"
+            >
+              <span>🔄</span>
+              {lang === 'en' ? 'ಕನ್ನಡದಲ್ಲಿ ಓದಿ (ಕನ್ನಡ)' : 'Read in English (ಇಂಗ್ಲಿಷ್)'}
+            </button>
+          </div>
+        </header>
+
+        {/* Auth Forms Panel */}
+        <main className="flex-grow max-w-md w-full mx-auto px-4 mt-12 flex items-center justify-center">
+          <div className="w-full bg-white/85 backdrop-blur-xl border border-emerald-100 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+            {/* Soft background glow */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-full blur-3xl opacity-50 -z-10"></div>
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-100 rounded-full blur-3xl opacity-50 -z-10"></div>
+
+            {authView === 'login' ? (
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-2">
+                  🛡️ {activeTranslations.auth.loginTitle}
+                </h2>
+                <p className="text-sm font-medium text-slate-500 mb-6">
+                  {activeTranslations.auth.loginSubtitle}
+                </p>
+
+                {authError && (
+                  <div className="mb-5 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold">
+                    ⚠️ {authError}
+                  </div>
+                )}
+
+                <form onSubmit={handlePhoneLogin} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                      {activeTranslations.auth.phoneLabel}
+                    </label>
+                    <input
+                      type="text"
+                      value={authPhone}
+                      onChange={(e) => setAuthPhone(e.target.value)}
+                      placeholder={activeTranslations.auth.phonePlaceholder}
+                      className="w-full bg-slate-50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white text-slate-800 placeholder-slate-400 font-bold px-4 py-3 rounded-2xl transition-all outline-none text-base"
+                      required
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1 font-semibold">
+                      {activeTranslations.auth.phoneFormatHint}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                      {activeTranslations.auth.passwordLabel}
+                    </label>
+                    <input
+                      type="password"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      placeholder={activeTranslations.auth.passwordPlaceholder}
+                      className="w-full bg-slate-50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white text-slate-800 placeholder-slate-400 font-bold px-4 py-3 rounded-2xl transition-all outline-none text-base"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 active:scale-[0.98] disabled:opacity-50 text-white font-extrabold text-lg px-6 py-4 rounded-2xl shadow-lg cursor-pointer transition-all flex items-center justify-center gap-2"
+                  >
+                    {authLoading ? activeTranslations.upi.checking : activeTranslations.auth.btnLogin}
+                  </button>
+                </form>
+
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={() => {
+                      setAuthView('signup');
+                      setAuthError('');
+                    }}
+                    className="text-emerald-600 hover:text-emerald-700 font-bold text-sm bg-none border-none cursor-pointer outline-none hover:underline"
+                  >
+                    {activeTranslations.auth.switchSignup}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-2">
+                  🌿 {activeTranslations.auth.signupTitle}
+                </h2>
+                <p className="text-sm font-medium text-slate-500 mb-6">
+                  {activeTranslations.auth.signupSubtitle}
+                </p>
+
+                {authError && (
+                  <div className="mb-5 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold">
+                    ⚠️ {authError}
+                  </div>
+                )}
+
+                <form onSubmit={handleRegister} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                      {activeTranslations.auth.nameLabel}
+                    </label>
+                    <input
+                      type="text"
+                      value={authName}
+                      onChange={(e) => setAuthName(e.target.value)}
+                      placeholder={activeTranslations.auth.namePlaceholder}
+                      className="w-full bg-slate-50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white text-slate-800 placeholder-slate-400 font-bold px-4 py-3 rounded-2xl transition-all outline-none text-base"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                      {activeTranslations.auth.phoneLabel}
+                    </label>
+                    <input
+                      type="text"
+                      value={authPhone}
+                      onChange={(e) => setAuthPhone(e.target.value)}
+                      placeholder={activeTranslations.auth.phonePlaceholder}
+                      className="w-full bg-slate-50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white text-slate-800 placeholder-slate-400 font-bold px-4 py-3 rounded-2xl transition-all outline-none text-base"
+                      required
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1 font-semibold">
+                      {activeTranslations.auth.phoneFormatHint}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                      {activeTranslations.auth.villageLabel}
+                    </label>
+                    <input
+                      type="text"
+                      value={authVillage}
+                      onChange={(e) => setAuthVillage(e.target.value)}
+                      placeholder={activeTranslations.auth.villagePlaceholder}
+                      className="w-full bg-slate-50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white text-slate-800 placeholder-slate-400 font-bold px-4 py-3 rounded-2xl transition-all outline-none text-base"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                      {activeTranslations.auth.passwordLabel}
+                    </label>
+                    <input
+                      type="password"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      placeholder={activeTranslations.auth.passwordPlaceholder}
+                      className="w-full bg-slate-50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white text-slate-800 placeholder-slate-400 font-bold px-4 py-3 rounded-2xl transition-all outline-none text-base"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 active:scale-[0.98] disabled:opacity-50 text-white font-extrabold text-lg px-6 py-4 rounded-2xl shadow-lg cursor-pointer transition-all flex items-center justify-center gap-2"
+                  >
+                    {authLoading ? activeTranslations.upi.checking : activeTranslations.auth.btnSignup}
+                  </button>
+                </form>
+
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={() => {
+                      setAuthView('login');
+                      setAuthError('');
+                    }}
+                    className="text-emerald-600 hover:text-emerald-700 font-bold text-sm bg-none border-none cursor-pointer outline-none hover:underline"
+                  >
+                    {activeTranslations.auth.switchLogin}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </main>
+
+        <footer className="mt-12 text-center py-6 border-t border-slate-100 max-w-4xl mx-auto px-4 text-xs sm:text-sm font-bold text-slate-400">
+          {activeTranslations.footer}
+        </footer>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-grid-pattern bg-[#fcfdfa] pb-12 flex flex-col font-sans">
       
-      {/* Top Banner and Language Toggle */}
+      {/* Dynamic Header */}
       <header className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-800 text-white shadow-lg sticky top-0 z-30">
         <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="bg-white/10 p-2 rounded-full safety-pulse">
-              <ShieldCheck className="w-8 h-8 text-emerald-200" />
+              <QrCode className="w-8 h-8 text-emerald-200" />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-2">
@@ -563,72 +1690,150 @@ export default function App() {
             </div>
           </div>
           
-          <button 
-            onClick={() => setLang(lang === 'en' ? 'kn' : 'en')}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-95 transition-all text-slate-950 font-bold px-5 py-2.5 rounded-full text-base shadow-md border-2 border-amber-300"
-          >
-            <span>🔄</span>
-            {lang === 'en' ? 'ಕನ್ನಡದಲ್ಲಿ ಓದಿ (ಕನ್ನಡ)' : 'Read in English (ಇಂಗ್ಲಿಷ್)'}
-          </button>
+          <div className="flex items-center gap-3 flex-wrap justify-center">
+            {/* User Profile Panel inside Header */}
+            <div className="bg-white/10 border border-white/20 rounded-2xl px-4 py-2 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center font-extrabold text-sm shadow-sm select-none">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="text-left leading-tight">
+                <p className="text-xs font-bold text-emerald-200 uppercase tracking-wider">
+                  {activeTranslations.auth.welcome}!
+                </p>
+                <p className="text-sm font-black text-white">
+                  {user.name} <span className="text-[10px] bg-emerald-500/30 text-emerald-200 font-bold px-2 py-0.5 rounded-full ml-1 select-none">📍 {user.village}</span>
+                </p>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setLang(lang === 'en' ? 'kn' : 'en')}
+              className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 transition-all text-slate-950 font-black px-4 py-2 rounded-2xl text-sm shadow-md border-2 border-amber-300 cursor-pointer"
+            >
+              🔄 {lang === 'en' ? 'ಕನ್ನಡ' : 'English'}
+            </button>
+
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-1 bg-rose-600 hover:bg-rose-700 active:scale-95 transition-all text-white font-black px-4 py-2 rounded-2xl text-sm shadow-md border border-rose-500 cursor-pointer"
+            >
+              🚪 {activeTranslations.auth.logout}
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Hero Welcome Message */}
+      {/* Hero Welcome Banner */}
       <section className="bg-emerald-50 border-b border-emerald-100 py-6 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-lg sm:text-xl font-bold text-emerald-950">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <h2 className="text-lg sm:text-xl font-bold text-emerald-950 text-center md:text-left flex-grow">
             👋 {activeTranslations.tagline}
           </h2>
+          
+          <div className="bg-white border-2 border-emerald-300 rounded-2xl px-5 py-2.5 shadow-sm flex items-center gap-3 shrink-0 animate-pulse">
+            <span className="text-2xl">🛡️</span>
+            <div className="text-left">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                {lang === 'en' ? 'Community Safety' : 'ಸಮುದಾಯದ ಸುರಕ್ಷತೆ'}
+              </p>
+              <p className="text-sm sm:text-base font-black text-slate-800">
+                {lang === 'en' 
+                  ? `Scams Reported Today: ${todayReportsCount}` 
+                  : `ಇಂದು ವರದಿ ಮಾಡಲಾದ ವಂಚನೆಗಳು: ${todayReportsCount}`}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Main Content Body */}
+      {/* Main Container */}
       <main className="flex-grow max-w-4xl w-full mx-auto px-4 mt-6">
         
-        {/* Navigation Tabs */}
-        <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-2xl mb-6 shadow-inner border border-slate-200">
+        {/* Navigation Tabs (Upgraded from 3 to 6 tabs) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-2xl mb-6 shadow-inner border border-slate-200">
+          
+          {/* Tab 1: UPI */}
           <button
             onClick={() => setActiveTab('upi')}
-            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-lg transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 ${
+            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-base transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 cursor-pointer ${
               activeTab === 'upi'
-                ? 'bg-white text-emerald-900 shadow-md border border-emerald-100'
+                ? 'bg-white text-emerald-950 shadow-md border border-emerald-100'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
             }`}
           >
-            <span className="text-base sm:text-xl">🔍</span>
-            <span className="hidden sm:inline">{lang === 'en' ? 'UPI / Phone Check' : 'ಯುಪಿಐ / ಫೋನ್ ಪರಿಶೀಲನೆ'}</span>
-            <span className="sm:hidden">{lang === 'en' ? 'UPI Check' : 'ಯುಪಿಐ ಚೆಕ್'}</span>
+            <span>🔍</span>
+            <span>{activeTranslations.tabs.upi}</span>
           </button>
 
+          {/* Tab 2: QR Scanner */}
+          <button
+            onClick={() => { setActiveTab('qr'); setQrSubTab('camera'); }}
+            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-base transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 cursor-pointer ${
+              activeTab === 'qr'
+                ? 'bg-white text-emerald-950 shadow-md border border-emerald-100'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <span>📷</span>
+            <span>{activeTranslations.tabs.qr}</span>
+          </button>
+
+          {/* Tab 3: Phishing */}
           <button
             onClick={() => setActiveTab('phishing')}
-            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-lg transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 ${
+            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-base transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 cursor-pointer ${
               activeTab === 'phishing'
-                ? 'bg-white text-emerald-900 shadow-md border border-emerald-100'
+                ? 'bg-white text-emerald-950 shadow-md border border-emerald-100'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
             }`}
           >
-            <span className="text-base sm:text-xl">✉️</span>
-            <span className="hidden sm:inline">{lang === 'en' ? 'Message / Link Check' : 'ಸಂದೇಶ ಪರಿಶೀಲನೆ'}</span>
-            <span className="sm:hidden">{lang === 'en' ? 'Msg Check' : 'ಸಂದೇಶ'}</span>
+            <span>✉️</span>
+            <span>{activeTranslations.tabs.phishing}</span>
           </button>
 
+          {/* Tab 4: OTP scam */}
           <button
-            onClick={() => setActiveTab('simulator')}
-            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-lg transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 ${
-              activeTab === 'simulator'
-                ? 'bg-white text-emerald-900 shadow-md border border-emerald-100'
+            onClick={() => setActiveTab('otp')}
+            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-base transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 cursor-pointer ${
+              activeTab === 'otp'
+                ? 'bg-white text-emerald-950 shadow-md border border-emerald-100'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
             }`}
           >
-            <span className="text-base sm:text-xl">📱</span>
-            <span className="hidden sm:inline">{lang === 'en' ? 'Safe Pay Simulator' : 'ಸುರಕ್ಷಿತ ಪಾವತಿ'}</span>
-            <span className="sm:hidden">{lang === 'en' ? 'Pay Practice' : 'ಸಿಮ್ಯುಲೇಟರ್'}</span>
+            <span>🔑</span>
+            <span>{activeTranslations.tabs.otp}</span>
           </button>
+
+          {/* Tab 5: Fake Loan App */}
+          <button
+            onClick={() => setActiveTab('loan')}
+            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-base transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 cursor-pointer ${
+              activeTab === 'loan'
+                ? 'bg-white text-emerald-950 shadow-md border border-emerald-100'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <span>💸</span>
+            <span>{activeTranslations.tabs.loan}</span>
+          </button>
+
+          {/* Tab 6: Simulator */}
+          <button
+            onClick={() => setActiveTab('simulator')}
+            className={`py-3 px-2 rounded-xl text-center font-bold text-sm sm:text-base transition-all duration-200 active:scale-95 flex flex-col sm:flex-row justify-center items-center gap-1.5 cursor-pointer ${
+              activeTab === 'simulator'
+                ? 'bg-white text-emerald-950 shadow-md border border-emerald-100'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <span>📱</span>
+            <span>{activeTranslations.tabs.simulator}</span>
+          </button>
+
         </div>
 
         {/* -------------------------------------------------------------
-            TAB 1: UPI ID / PAYMENT RISK ANALYZER
+            TAB 1: UPI ID / PHONE RISK ANALYZER
            ------------------------------------------------------------- */}
         {activeTab === 'upi' && (
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-emerald-100/50 space-y-6">
@@ -664,7 +1869,7 @@ export default function App() {
                 <button
                   type="submit"
                   disabled={upiLoading}
-                  className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black text-base sm:text-lg px-8 py-4 rounded-2xl disabled:bg-slate-400 shadow-md flex items-center justify-center gap-2"
+                  className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black text-base sm:text-lg px-8 py-4 rounded-2xl disabled:bg-slate-400 shadow-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {upiLoading ? (
                     <>
@@ -681,134 +1886,177 @@ export default function App() {
               </div>
             </form>
 
-            {/* Quick Demo Examples */}
-            <div className="pt-2 border-t border-slate-100">
-              <p className="text-xs font-black uppercase tracking-wider text-slate-400 mb-2.5">
-                {activeTranslations.upi.examples}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => {
-                    setUpiInput('pmkisan-relief@ybl');
-                    handleCheckUpi(null, 'pmkisan-relief@ybl');
-                  }}
-                  className="px-4 py-2 text-xs sm:text-sm font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-full border border-rose-200 active:scale-95 transition-all"
-                >
-                  🛑 pmkisan-relief@ybl (Fake scheme)
-                </button>
-                <button
-                  onClick={() => {
-                    setUpiInput('merchant@icici');
-                    handleCheckUpi(null, 'merchant@icici');
-                  }}
-                  className="px-4 py-2 text-xs sm:text-sm font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-full border border-emerald-200 active:scale-95 transition-all"
-                >
-                  🟢 merchant@icici (Safe Merchant)
-                </button>
-                <button
-                  onClick={() => {
-                    setUpiInput('9876543210');
-                    handleCheckUpi(null, '9876543210');
-                  }}
-                  className="px-4 py-2 text-xs sm:text-sm font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-full border border-amber-200 active:scale-95 transition-all"
-                >
-                  🟡 9876543210 (Personal phone)
-                </button>
-              </div>
-            </div>
 
-            {/* Visual Risk Analyzer Result Card */}
-            {upiResult && (
-              <div className={`mt-6 rounded-3xl p-5 border-2 ${getStatusColorClasses(upiResult.status).bg} transition-all duration-300 shadow-md space-y-6`}>
-                
-                {/* Score and Verdict Header */}
-                <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-6 pb-5 border-b border-black/10">
-                  
-                  {/* Gauge Speedometer Visualizer */}
-                  <div className="flex flex-col items-center">
-                    <div className="gauge-container">
-                      <div className="gauge-body"></div>
-                      <div 
-                        className={`gauge-fill ${getStatusColorClasses(upiResult.status).meter}`}
-                        style={{
-                          transform: `rotate(${upiResult.score * 1.8}deg)`
-                        }}
-                      ></div>
-                      <div className="gauge-cover">
-                        <span className="text-2xl font-black text-slate-800">{upiResult.score}</span>
-                        <span className="text-xs font-bold text-slate-500 ml-0.5 mb-1">/100</span>
-                      </div>
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-500 mt-2">
-                      {activeTranslations.upi.riskScore}
-                    </span>
-                  </div>
 
-                  {/* High Level Verdict */}
-                  <div className="text-center sm:text-right flex flex-col items-center sm:items-end gap-2">
-                    <span className={`text-xl sm:text-2xl font-black px-5 py-2 rounded-full ${getStatusColorClasses(upiResult.status).badge}`}>
-                      {upiResult.status === 'safe' && activeTranslations.upi.verdicts.safe}
-                      {upiResult.status === 'caution' && activeTranslations.upi.verdicts.caution}
-                      {upiResult.status === 'danger' && activeTranslations.upi.verdicts.danger}
-                    </span>
-                    
-                    <p className="text-base sm:text-lg font-extrabold max-w-sm">
-                      {lang === 'en' ? upiResult.message_en : upiResult.message_kn}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Explanation Bullets */}
-                <div className="space-y-3">
-                  <h4 className="text-base font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                    <ShieldAlert className="w-5 h-5 text-slate-600" />
-                    {activeTranslations.upi.warningTitle}
-                  </h4>
-                  
-                  <ul className="space-y-3.5 pl-2">
-                    {(lang === 'en' ? upiResult.details_en : upiResult.details_kn).map((detail, idx) => (
-                      <li key={idx} className="text-base sm:text-lg font-bold flex items-start gap-2.5">
-                        <span className="text-emerald-600 text-lg mt-0.5">🔹</span>
-                        <span>{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Audio Assistance Controls */}
-                <div className="pt-4 flex justify-center sm:justify-start">
-                  {isPlayingAudio ? (
-                    <button
-                      onClick={stopAudio}
-                      className="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold px-6 py-3 rounded-2xl text-base shadow-md border-2 border-slate-700"
-                    >
-                      <VolumeX className="w-6 h-6 animate-pulse text-rose-400" />
-                      <span>{activeTranslations.upi.audioStop}</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => playTTS(
-                        lang === 'en'
-                          ? `${upiResult.message_en}. Reasons. ${upiResult.details_en.join('. ')}`
-                          : `${upiResult.message_kn}. ಕಾರಣಗಳು. ${upiResult.details_kn.join('. ')}`,
-                        lang
-                      )}
-                      className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-95 text-slate-950 font-black px-6 py-3.5 rounded-2xl text-base sm:text-lg shadow-md border-2 border-amber-400"
-                    >
-                      <Volume2 className="w-6 h-6 text-slate-950" />
-                      <span>{activeTranslations.upi.audioBtn}</span>
-                    </button>
-                  )}
-                </div>
-
-              </div>
-            )}
+            {renderResultCard(upiResult, 'upi', upiInput)}
 
           </div>
         )}
 
         {/* -------------------------------------------------------------
-            TAB 2: MESSAGE / LINK PHISHING DETECTOR
+            TAB 2: QR CODE SAFETY SCANNER (NEW)
+           ------------------------------------------------------------- */}
+        {activeTab === 'qr' && (
+          <div className="bg-white rounded-3xl p-6 shadow-xl border border-emerald-100/50 space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-emerald-100 rounded-2xl text-emerald-700">
+                <QrCode className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                  {activeTranslations.qr.title}
+                </h3>
+                <p className="text-sm sm:text-base text-slate-600 mt-1">
+                  {activeTranslations.qr.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Sub Tabs Selection */}
+            <div className="flex flex-wrap gap-2 bg-slate-100 p-1.5 rounded-2xl mb-4 border border-slate-200 w-fit">
+              <button
+                type="button"
+                onClick={() => setQrSubTab('camera')}
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 ${
+                  qrSubTab === 'camera'
+                    ? 'bg-white text-emerald-955 shadow-sm border border-slate-300'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/30'
+                }`}
+              >
+                <span>📷</span>
+                <span>{lang === 'en' ? 'Camera' : 'ಕ್ಯಾಮೆರಾ'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setQrSubTab('upload')}
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 ${
+                  qrSubTab === 'upload'
+                    ? 'bg-white text-emerald-955 shadow-sm border border-slate-300'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/30'
+                }`}
+              >
+                <span>🖼️</span>
+                <span>{lang === 'en' ? 'Upload Photo' : 'ಫೋಟೋ ಅಪ್‌ಲೋಡ್'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setQrSubTab('paste')}
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 ${
+                  qrSubTab === 'paste'
+                    ? 'bg-white text-emerald-955 shadow-sm border border-slate-300'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/30'
+                }`}
+              >
+                <span>🔗</span>
+                <span>{lang === 'en' ? 'Paste Link' : 'ಲಿಂಕ್ ಪೇಸ್ಟ್'}</span>
+              </button>
+            </div>
+
+            {/* Sub-Tab 1: CAMERA scanning preview */}
+            {qrSubTab === 'camera' && (
+              <div className="space-y-4">
+                {cameraError ? (
+                  <div className="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl text-amber-900 font-extrabold text-sm sm:text-base">
+                    ⚠️ {cameraError}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-4">
+                    {/* Glowing Viewfinder frame */}
+                    <div className="relative border-4 border-emerald-500 rounded-3xl overflow-hidden bg-slate-900 shadow-2xl max-w-sm w-full h-[240px] flex items-center justify-center">
+                      
+                      {/* Video capture */}
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+
+                      {/* Viewfinder Neon Box Overlay */}
+                      <div className="absolute inset-4 border-2 border-emerald-400/70 rounded-2xl pointer-events-none flex items-center justify-center">
+                        <div className="w-10 h-10 border-t-4 border-l-4 border-emerald-400 absolute top-0 left-0"></div>
+                        <div className="w-10 h-10 border-t-4 border-r-4 border-emerald-400 absolute top-0 right-0"></div>
+                        <div className="w-10 h-10 border-b-4 border-l-4 border-emerald-400 absolute bottom-0 left-0"></div>
+                        <div className="w-10 h-10 border-b-4 border-r-4 border-emerald-400 absolute bottom-0 right-0"></div>
+                      </div>
+
+                      {/* Sweeping Laser Line Animation */}
+                      <div className="absolute left-4 right-4 h-1.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-lg shadow-emerald-400/80 laser-sweep-line pointer-events-none"></div>
+                    </div>
+                    
+                    <p className="text-base sm:text-lg font-black text-slate-700 animate-pulse text-center">
+                      🔍 {lang === 'en' ? 'Point camera at QR code' : 'ಕ್ಯೂಆರ್ ಕೋಡ್‌ನತ್ತ ಕ್ಯಾಮೆರಾ ಹಿಡಿಯಿರಿ'}
+                    </p>
+                  </div>
+                )}
+                {/* Hidden canvas for extraction */}
+                <canvas ref={canvasRef} className="hidden" />
+              </div>
+            )}
+
+            {/* Sub-Tab 2: UPLOAD PHOTO dropzone */}
+            {qrSubTab === 'upload' && (
+              <div className="relative border-3 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-6 text-center bg-slate-50 transition-all cursor-pointer group flex flex-col justify-center items-center h-48">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">🖼️</span>
+                <span className="text-base font-bold text-slate-600 group-hover:text-emerald-700">
+                  {uploadedFileName ? `📂 ${uploadedFileName}` : activeTranslations.qr.uploadLabel}
+                </span>
+              </div>
+            )}
+
+            {/* Sub-Tab 3: PASTE LINK input */}
+            {qrSubTab === 'paste' && (
+              <form onSubmit={handleCheckQr} className="space-y-4">
+                <label className="block text-base font-bold text-slate-700">
+                  {lang === 'en' ? 'Paste decoded QR Link here:' : 'ಕ್ಯೂಆರ್ ಕೋಡ್‌ನ ಲಿಂಕ್ ಪೇಸ್ಟ್ ಮಾಡಿ:'}
+                </label>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    value={qrInput}
+                    onChange={(e) => setQrInput(e.target.value)}
+                    placeholder={activeTranslations.qr.inputPlaceholder}
+                    className="flex-grow p-4 border-2 border-slate-300 rounded-2xl text-base sm:text-lg focus:border-emerald-600 focus:outline-none font-medium shadow-inner"
+                    required
+                  />
+                  
+                  <button
+                    type="submit"
+                    disabled={qrLoading}
+                    className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black text-base sm:text-lg px-8 py-4 rounded-2xl disabled:bg-slate-400 shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {qrLoading ? (
+                      <>
+                        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        <span>{activeTranslations.qr.checking}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{activeTranslations.qr.btnCheck}</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+
+
+
+            {renderResultCard(qrResult, 'qr', qrInput)}
+
+          </div>
+        )}
+
+        {/* -------------------------------------------------------------
+            TAB 3: MESSAGE / LINK PHISHING DETECTOR
            ------------------------------------------------------------- */}
         {activeTab === 'phishing' && (
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-emerald-100/50 space-y-6">
@@ -844,7 +2092,7 @@ export default function App() {
                 <button
                   type="submit"
                   disabled={messageLoading}
-                  className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black text-base sm:text-lg px-8 py-4 rounded-2xl disabled:bg-slate-400 shadow-md flex items-center justify-center gap-2 w-full sm:w-auto"
+                  className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black text-base sm:text-lg px-8 py-4 rounded-2xl disabled:bg-slate-400 shadow-md flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer"
                 >
                   {messageLoading ? (
                     <>
@@ -861,147 +2109,137 @@ export default function App() {
               </div>
             </form>
 
-            {/* Quick Demo Examples */}
-            <div className="pt-2 border-t border-slate-100">
-              <p className="text-xs font-black uppercase tracking-wider text-slate-400 mb-2.5">
-                {activeTranslations.upi.examples}
-              </p>
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => {
-                    const txt = "Send ₹500 processing fee to claim PM Awas Yojana housing subsidy immediately!";
-                    setMessageInput(txt);
-                    handleCheckMessage(null, txt);
-                  }}
-                  className="text-left px-4 py-3 text-xs sm:text-sm font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-2xl border border-rose-200 active:scale-95 transition-all w-full flex items-center gap-2"
-                >
-                  🛑 "Send ₹500 fee to claim PM Awas Yojana..." (Fake scheme fee scam)
-                </button>
-                <button
-                  onClick={() => {
-                    const txt = "URGENT: Your electricity power will be disconnected at 9:30 PM today because of your unpaid bill. Call our manager at 9876543210.";
-                    setMessageInput(txt);
-                    handleCheckMessage(null, txt);
-                  }}
-                  className="text-left px-4 py-3 text-xs sm:text-sm font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-2xl border border-rose-200 active:scale-95 transition-all w-full flex items-center gap-2"
-                >
-                  🛑 "URGENT: Your electricity power will be disconnected..." (Threat KYC scam)
-                </button>
-                <button
-                  onClick={() => {
-                    const txt = "Congratulations! You are selected for part-time job from home, earning ₹8,000 daily by liking videos. Click: easy-job.info";
-                    setMessageInput(txt);
-                    handleCheckMessage(null, txt);
-                  }}
-                  className="text-left px-4 py-3 text-xs sm:text-sm font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-2xl border border-amber-200 active:scale-95 transition-all w-full flex items-center gap-2"
-                >
-                  🟡 "Congratulations! You are selected for part-time job..." (Work scam link)
-                </button>
-              </div>
-            </div>
 
-            {/* Message Scan Results */}
-            {messageResult && (
-              <div className={`mt-6 rounded-3xl p-5 border-2 ${getStatusColorClasses(messageResult.status).bg} transition-all duration-300 shadow-md space-y-6`}>
-                
-                {/* Result Header */}
-                <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-6 pb-5 border-b border-black/10">
-                  <div className="flex flex-col items-center">
-                    <div className="gauge-container">
-                      <div className="gauge-body"></div>
-                      <div 
-                        className={`gauge-fill ${getStatusColorClasses(messageResult.status).meter}`}
-                        style={{
-                          transform: `rotate(${messageResult.score * 1.8}deg)`
-                        }}
-                      ></div>
-                      <div className="gauge-cover">
-                        <span className="text-2xl font-black text-slate-800">{messageResult.score}</span>
-                        <span className="text-xs font-bold text-slate-500 ml-0.5 mb-1">/100</span>
-                      </div>
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-500 mt-2">
-                      {activeTranslations.upi.riskScore}
-                    </span>
-                  </div>
 
-                  <div className="text-center sm:text-right flex flex-col items-center sm:items-end gap-2">
-                    <span className={`text-xl sm:text-2xl font-black px-5 py-2 rounded-full ${getStatusColorClasses(messageResult.status).badge}`}>
-                      {messageResult.status === 'safe' && activeTranslations.upi.verdicts.safe}
-                      {messageResult.status === 'caution' && activeTranslations.upi.verdicts.caution}
-                      {messageResult.status === 'danger' && activeTranslations.upi.verdicts.danger}
-                    </span>
-                    
-                    <p className="text-base sm:text-lg font-extrabold max-w-sm">
-                      {lang === 'en' ? messageResult.message_en : messageResult.message_kn}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Explanation Bullets */}
-                <div className="space-y-3">
-                  <h4 className="text-base font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                    <ShieldAlert className="w-5 h-5 text-slate-600" />
-                    {activeTranslations.upi.warningTitle}
-                  </h4>
-                  
-                  <ul className="space-y-3.5 pl-2">
-                    {(lang === 'en' ? messageResult.details_en : messageResult.details_kn).map((detail, idx) => (
-                      <li key={idx} className="text-base sm:text-lg font-bold flex items-start gap-2.5">
-                        <span className="text-emerald-600 text-lg mt-0.5">🔹</span>
-                        <span>{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Highlighted What to Do Next Advice */}
-                {messageResult.tip_en && (
-                  <div className="bg-amber-100/90 border-2 border-amber-300 rounded-2xl p-4.5 space-y-2">
-                    <h5 className="text-base font-black text-amber-950 flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-amber-700" />
-                      {activeTranslations.phishing.nextStep}
-                    </h5>
-                    <p className="text-base sm:text-lg font-bold text-amber-900">
-                      {lang === 'en' ? messageResult.tip_en : messageResult.tip_kn}
-                    </p>
-                  </div>
-                )}
-
-                {/* TTS Controls */}
-                <div className="pt-2 flex justify-center sm:justify-start">
-                  {isPlayingAudio ? (
-                    <button
-                      onClick={stopAudio}
-                      className="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold px-6 py-3 rounded-2xl text-base shadow-md border-2 border-slate-700"
-                    >
-                      <VolumeX className="w-6 h-6 animate-pulse text-rose-400" />
-                      <span>{activeTranslations.upi.audioStop}</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => playTTS(
-                        lang === 'en'
-                          ? `${messageResult.message_en}. Explanation. ${messageResult.details_en.join('. ')}. Advice. ${messageResult.tip_en}`
-                          : `${messageResult.message_kn}. ಕಾರಣಗಳು. ${messageResult.details_kn.join('. ')}. ಸಲಹೆ. ${messageResult.tip_kn}`,
-                        lang
-                      )}
-                      className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-95 text-slate-950 font-black px-6 py-3.5 rounded-2xl text-base sm:text-lg shadow-md border-2 border-amber-400"
-                    >
-                      <Volume2 className="w-6 h-6 text-slate-950" />
-                      <span>{activeTranslations.phishing.audioBtn}</span>
-                    </button>
-                  )}
-                </div>
-
-              </div>
-            )}
+            {renderResultCard(messageResult, 'phishing', messageInput)}
 
           </div>
         )}
 
         {/* -------------------------------------------------------------
-            TAB 3: BEHAVIORAL SAFETY NUDGE SIMULATOR
+            TAB 4: OTP SCAM DETECTOR (NEW)
+           ------------------------------------------------------------- */}
+        {activeTab === 'otp' && (
+          <div className="bg-white rounded-3xl p-6 shadow-xl border border-emerald-100/50 space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-emerald-100 rounded-2xl text-emerald-700">
+                <KeyRound className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                  {activeTranslations.otp.title}
+                </h3>
+                <p className="text-sm sm:text-base text-slate-600 mt-1">
+                  {activeTranslations.otp.description}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleCheckOtp} className="space-y-4">
+              <label className="block text-base font-bold text-slate-700">
+                {lang === 'en' ? 'Paste the message asking for code/OTP:' : 'ಒಟಿಪಿ ಅಥವಾ ಕೋಡ್ ಕೇಳುವ ಸಂದೇಶವನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ:'}
+              </label>
+
+              <textarea
+                value={otpInput}
+                onChange={(e) => setOtpInput(e.target.value)}
+                placeholder={activeTranslations.otp.inputPlaceholder}
+                rows={3}
+                className="w-full p-4 border-2 border-slate-300 rounded-2xl text-base sm:text-lg focus:border-emerald-600 focus:outline-none font-medium shadow-inner"
+                required
+              />
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={otpLoading}
+                  className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black text-base sm:text-lg px-8 py-4 rounded-2xl disabled:bg-slate-400 shadow-md flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer"
+                >
+                  {otpLoading ? (
+                    <>
+                      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      <span>{activeTranslations.otp.scanning}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{activeTranslations.otp.btnCheck}</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+
+
+            {renderResultCard(otpResult, 'otp', otpInput)}
+
+          </div>
+        )}
+
+        {/* -------------------------------------------------------------
+            TAB 5: FAKE LOAN APP CHECKER (NEW)
+           ------------------------------------------------------------- */}
+        {activeTab === 'loan' && (
+          <div className="bg-white rounded-3xl p-6 shadow-xl border border-emerald-100/50 space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-emerald-100 rounded-2xl text-emerald-700">
+                <TrendingDown className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                  {activeTranslations.loan.title}
+                </h3>
+                <p className="text-sm sm:text-base text-slate-600 mt-1">
+                  {activeTranslations.loan.description}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleCheckLoan} className="space-y-4">
+              <label className="block text-base font-bold text-slate-700">
+                {lang === 'en' ? 'Type app name or Play Store link:' : 'ಸಾಲ ನೀಡುವ ಆಪ್‌ನ ಹೆಸರು ಅಥವಾ ಲಿಂಕ್ ಹಾಕಿ:'}
+              </label>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="text"
+                  value={loanInput}
+                  onChange={(e) => setLoanInput(e.target.value)}
+                  placeholder={activeTranslations.loan.inputPlaceholder}
+                  className="flex-grow p-4 border-2 border-slate-300 rounded-2xl text-base sm:text-lg focus:border-emerald-600 focus:outline-none font-medium shadow-inner"
+                  required
+                />
+                
+                <button
+                  type="submit"
+                  disabled={loanLoading}
+                  className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black text-base sm:text-lg px-8 py-4 rounded-2xl disabled:bg-slate-400 shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {loanLoading ? (
+                    <>
+                      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      <span>{activeTranslations.loan.checking}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{activeTranslations.loan.btnCheck}</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+
+
+            {renderResultCard(loanResult, 'loan', loanInput)}
+
+          </div>
+        )}
+
+        {/* -------------------------------------------------------------
+            TAB 6: BEHAVIORAL SAFETY NUDGE SIMULATOR
            ------------------------------------------------------------- */}
         {activeTab === 'simulator' && (
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-emerald-100/50 space-y-6">
@@ -1030,7 +2268,6 @@ export default function App() {
                 </div>
 
                 <div className="pt-4 space-y-6">
-                  {/* Bank/Wallet Header Mock */}
                   <div className="text-center pb-3 border-b border-slate-300">
                     <span className="text-xs font-black uppercase text-emerald-800 tracking-wider">
                       Village Gramin Pay Wallet
@@ -1071,7 +2308,6 @@ export default function App() {
                         />
                       </div>
                       
-                      {/* Interactive presets helper */}
                       <div className="flex gap-2 pt-1.5">
                         <button
                           type="button"
@@ -1079,7 +2315,7 @@ export default function App() {
                             setSimRecipient('pmkisan-relief@ybl');
                             setSimAmount('8000');
                           }}
-                          className="px-2.5 py-1 text-2xs font-extrabold bg-rose-100 text-rose-800 rounded-md border border-rose-200 active:scale-95 transition-all text-xs"
+                          className="px-2.5 py-1 text-2xs font-extrabold bg-rose-100 text-rose-800 rounded-md border border-rose-200 active:scale-95 transition-all text-xs cursor-pointer"
                         >
                           ₹8,000 preset
                         </button>
@@ -1089,7 +2325,7 @@ export default function App() {
                             setSimRecipient('relative-help@ybl');
                             setSimAmount('3000');
                           }}
-                          className="px-2.5 py-1 text-2xs font-extrabold bg-emerald-100 text-emerald-800 rounded-md border border-emerald-200 active:scale-95 transition-all text-xs"
+                          className="px-2.5 py-1 text-2xs font-extrabold bg-emerald-100 text-emerald-800 rounded-md border border-emerald-200 active:scale-95 transition-all text-xs cursor-pointer"
                         >
                           ₹3,000 preset
                         </button>
@@ -1098,13 +2334,12 @@ export default function App() {
 
                     <button
                       type="submit"
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black py-4.5 rounded-2xl text-base shadow-md border-2 border-emerald-500"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-black py-4.5 rounded-2xl text-base shadow-md border-2 border-emerald-500 cursor-pointer"
                     >
                       {activeTranslations.nudge.btnSend}
                     </button>
                   </form>
 
-                  {/* Simulator Success Output */}
                   {simMessage && (
                     <div className="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-emerald-900 font-extrabold text-sm sm:text-base shadow-inner">
                       {simMessage}
@@ -1117,7 +2352,7 @@ export default function App() {
               {/* Informative Explanation Side Card */}
               <div className="bg-slate-50 border-2 border-slate-200 rounded-3xl p-5 space-y-4">
                 <h4 className="text-lg font-black text-slate-800 flex items-center gap-1.5">
-                  <UserCheck className="w-6 h-6 text-emerald-600" />
+                  <ShieldCheck className="w-6 h-6 text-emerald-600" />
                   {lang === 'en' ? 'How the Nudge protects you:' : 'ಸುರಕ್ಷತಾ ಎಚ್ಚರಿಕೆ ಹೇಗೆ ರಕ್ಷಿಸುತ್ತದೆ:'}
                 </h4>
                 
@@ -1144,16 +2379,109 @@ export default function App() {
           </div>
         )}
 
+        {/* RECENT SCANS DASHBOARD (NEW) */}
+        <div className="mt-8 pt-8 border-t border-slate-200">
+          <div className="bg-[#f8faf6] border-2 border-slate-200/80 rounded-3xl p-6 space-y-5 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div className="flex items-center gap-2.5">
+                <span className="text-2xl">📋</span>
+                <div className="text-left">
+                  <h3 className="text-lg sm:text-xl font-black text-slate-800">
+                    {lang === 'en' ? 'Recent Security Checks' : 'ಇತ್ತೀಚಿನ ಸುರಕ್ಷತಾ ತಪಾಸಣೆಗಳು'}
+                  </h3>
+                  <p className="text-xs sm:text-sm font-bold text-slate-500">
+                    {lang === 'en' 
+                      ? 'Anonymized list of last 5 scans. Personal data is always masked.' 
+                      : 'ಕೊನೆಯ ೫ ತಪಾಸಣೆಗಳ ಅನಾಮಧೇಯ ಪಟ್ಟಿ. ವೈಯಕ್ತಿಕ ಮಾಹಿತಿ ಎಂದಿಗೂ ಸುರಕ್ಷಿತವಾಗಿರುತ್ತದೆ.'}
+                  </p>
+                </div>
+              </div>
+              
+              <button
+                onClick={fetchRecentScans}
+                className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-600 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <span>🔄</span>
+                {lang === 'en' ? 'Refresh' : 'ನವೀಕರಿಸಿ'}
+              </button>
+            </div>
+
+            {recentScans.length === 0 ? (
+              <div className="bg-white border border-dashed border-slate-300 rounded-2xl py-8 text-center">
+                <p className="text-sm font-bold text-slate-400">
+                  {lang === 'en' 
+                    ? '🛡️ No scans checked yet. Your history will be recorded securely here.' 
+                    : '🛡️ ಯಾವುದೇ ತಪಾಸಣೆ ಮಾಡಲಾಗಿಲ್ಲ. ನಿಮ್ಮ ಸುರಕ್ಷಿತ ಇತಿಹಾಸ ಇಲ್ಲಿ ದಾಖಲಾಗುತ್ತದೆ.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {recentScans.map((scan) => {
+                  let badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                  if (scan.result === 'caution') badgeColor = "bg-amber-100 text-amber-800 border-amber-300";
+                  if (scan.result === 'danger') badgeColor = "bg-rose-100 text-rose-800 border-rose-300";
+                  
+                  let typeLabel = scan.type.toUpperCase();
+                  let icon = "🔍";
+                  if (scan.type === 'qr') { icon = "📷"; typeLabel = lang === 'en' ? "QR SCAN" : "ಕ್ಯೂಆರ್ ಸ್ಕ್ಯಾನ್"; }
+                  if (scan.type === 'phishing') { icon = "✉️"; typeLabel = lang === 'en' ? "WHATSAPP" : "ವಾಟ್ಸಾಪ್"; }
+                  if (scan.type === 'otp') { icon = "🔑"; typeLabel = lang === 'en' ? "OTP DETECTOR" : "ಒಟಿಪಿ ತಪಾಸಣೆ"; }
+                  if (scan.type === 'loan') { icon = "💸"; typeLabel = lang === 'en' ? "LOAN CHECK" : "ಸಾಲದ ಆಪ್"; }
+                  if (scan.type === 'upi') { icon = "🔍"; typeLabel = lang === 'en' ? "UPI CHECK" : "ಯುಪಿಐ ತಪಾಸಣೆ"; }
+
+                  return (
+                    <div 
+                      key={scan.id} 
+                      className="bg-white border border-slate-200 p-4 rounded-2xl flex flex-col justify-between gap-3 hover:shadow-md hover:border-emerald-200 transition-all duration-200 text-left"
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{icon}</span>
+                          <span className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                            {typeLabel}
+                          </span>
+                        </div>
+                        
+                        <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${badgeColor}`}>
+                          {scan.result.toUpperCase()}
+                        </span>
+                      </div>
+
+                      <div className="bg-slate-50 rounded-xl p-2.5 text-slate-700 font-extrabold text-xs sm:text-sm break-all border border-slate-100 select-all">
+                        {scan.input}
+                      </div>
+
+                      <div className="flex justify-between items-center gap-4 text-[10px] text-slate-400 font-extrabold">
+                        <div className="flex items-center gap-1.5 w-full max-w-[120px]">
+                          <span className="shrink-0">{lang === 'en' ? 'Risk:' : 'ಅಪಾಯ:'}</span>
+                          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
+                            <div 
+                              className={`h-full ${scan.result === 'danger' ? 'bg-rose-500' : scan.result === 'caution' ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                              style={{ width: `${scan.risk_score}%` }}
+                            ></div>
+                          </div>
+                          <span className="shrink-0 text-slate-600 font-black">{scan.risk_score}</span>
+                        </div>
+                        
+                        <span className="shrink-0">
+                          {new Date(scan.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
       </main>
 
-      {/* -------------------------------------------------------------
-          BEHAVIORAL SAFETY NUDGE MODAL DIALOG
-         ------------------------------------------------------------- */}
+      {/* BEHAVIORAL SAFETY NUDGE MODAL DIALOG */}
       {showNudgeModal && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border-4 border-rose-500 shadow-2xl max-w-lg w-full p-6 animate-scale-up space-y-6">
             
-            {/* Modal Header */}
             <div className="flex items-start gap-3.5 pb-4 border-b border-slate-100">
               <div className="bg-rose-100 p-2.5 rounded-2xl text-rose-600 mt-1 shrink-0">
                 <ShieldAlert className="w-8 h-8" />
@@ -1168,21 +2496,19 @@ export default function App() {
               </div>
             </div>
 
-            {/* Urgency Alert Warning */}
             <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4">
               <p className="text-base sm:text-lg font-bold text-rose-900 leading-snug">
                 ⚠️ <strong>{activeTranslations.nudge.modalUrgency}</strong>
               </p>
             </div>
 
-            {/* Safety Checkbox verification */}
             <div className="space-y-4">
               <label className="flex items-start gap-3 p-3 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer font-bold text-base sm:text-lg">
                 <input
                   type="checkbox"
                   checked={confirmChecks.knowPerson}
                   onChange={(e) => setConfirmChecks({ ...confirmChecks, knowPerson: e.target.checked })}
-                  className="w-6 h-6 border-2 border-slate-400 rounded-md text-emerald-600 mt-0.5 shrink-0"
+                  className="w-6 h-6 border-2 border-slate-400 rounded-md text-emerald-600 mt-0.5 shrink-0 cursor-pointer"
                 />
                 <span>{activeTranslations.nudge.modalCheck1}</span>
               </label>
@@ -1192,7 +2518,7 @@ export default function App() {
                   type="checkbox"
                   checked={confirmChecks.noThreat}
                   onChange={(e) => setConfirmChecks({ ...confirmChecks, noThreat: e.target.checked })}
-                  className="w-6 h-6 border-2 border-slate-400 rounded-md text-emerald-600 mt-0.5 shrink-0"
+                  className="w-6 h-6 border-2 border-slate-400 rounded-md text-emerald-600 mt-0.5 shrink-0 cursor-pointer"
                 />
                 <span>{activeTranslations.nudge.modalCheck2}</span>
               </label>
@@ -1202,13 +2528,12 @@ export default function App() {
                   type="checkbox"
                   checked={confirmChecks.noPrize}
                   onChange={(e) => setConfirmChecks({ ...confirmChecks, noPrize: e.target.checked })}
-                  className="w-6 h-6 border-2 border-slate-400 rounded-md text-emerald-600 mt-0.5 shrink-0"
+                  className="w-6 h-6 border-2 border-slate-400 rounded-md text-emerald-600 mt-0.5 shrink-0 cursor-pointer"
                 />
                 <span>{activeTranslations.nudge.modalCheck3}</span>
               </label>
             </div>
 
-            {/* Modal Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 onClick={() => {
@@ -1218,7 +2543,7 @@ export default function App() {
                     : "❌ ಉತ್ತಮ ಆಯ್ಕೆ! ಪಾವತಿಯನ್ನು ನಿಲ್ಲಿಸಲಾಗಿದೆ. ವಂಚಕರು ನಿಮ್ಮ ಮೇಲೆ ಒತ್ತಡ ಹೇರಲು ಪ್ರಯತ್ನಿಸುತ್ತಾರೆ, ಆದರೆ ಅದನ್ನು ನಿಲ್ಲಿಸಿದ್ದು ನಿಮ್ಮ ಹಣವನ್ನು ಉಳಿಸಿದೆ!";
                   setSimMessage(msg);
                 }}
-                className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-4.5 rounded-2xl text-base sm:text-lg border-2 border-rose-500 shadow-md active:scale-95 transition-all text-center"
+                className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black py-4.5 rounded-2xl text-base sm:text-lg border-2 border-rose-500 shadow-md active:scale-95 transition-all text-center cursor-pointer"
               >
                 {activeTranslations.nudge.btnCancel}
               </button>
@@ -1226,7 +2551,7 @@ export default function App() {
               <button
                 onClick={handleConfirmNudge}
                 disabled={!(confirmChecks.knowPerson && confirmChecks.noThreat && confirmChecks.noPrize)}
-                className="flex-1 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:bg-slate-100 text-slate-800 font-extrabold py-4.5 rounded-2xl text-base sm:text-lg border border-slate-300 shadow-sm active:scale-95 transition-all text-center"
+                className="flex-1 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:bg-slate-100 text-slate-800 font-extrabold py-4.5 rounded-2xl text-base sm:text-lg border border-slate-300 shadow-sm active:scale-95 transition-all text-center cursor-pointer"
               >
                 {activeTranslations.nudge.btnConfirm}
               </button>
@@ -1236,7 +2561,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Footer Branding */}
+      {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 py-6 px-4 bg-slate-50">
         <div className="max-w-4xl mx-auto text-center space-y-1.5">
           <p className="text-xs sm:text-sm font-bold text-slate-500">

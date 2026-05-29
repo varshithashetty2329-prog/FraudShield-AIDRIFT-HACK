@@ -83,3 +83,15 @@
   justify-content: center;
   padding-bottom: 5px;
 }
+
+/* Real-time Camera Scanner Laser Line Sweep Animation */
+@keyframes laser-sweep {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(220px); }
+  100% { transform: translateY(0); }
+}
+
+.laser-sweep-line {
+  animation: laser-sweep 3s infinite ease-in-out;
+}
+
