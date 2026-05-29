@@ -11,21 +11,21 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing
 
-# Initialize Anthropic client if key is available and valid
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+# Initialize Gemini client if key is available and valid
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 HAS_REAL_API = False
 
 # Avoid using the placeholder API key
-if ANTHROPIC_API_KEY and ANTHROPIC_API_KEY != "your_api_key_here":
+if GEMINI_API_KEY and GEMINI_API_KEY != "your_api_key_here":
     try:
-        from anthropic import Anthropic
-        client = Anthropic(api_key=ANTHROPIC_API_KEY)
+        import google.generativeai as genai
+        genai.configure(api_key=GEMINI_API_KEY)
         HAS_REAL_API = True
-        print("Anthropic Client initialized successfully in live mode.")
+        print("Gemini API initialized successfully in live mode.")
     except Exception as e:
-        print(f"Error initializing Anthropic client, running in local fallback mode: {e}")
+        print(f"Error initializing Gemini client, running in local fallback mode: {e}")
 else:
-    print("No valid Anthropic API key found. Running in Smart Mock Mode.")
+    print("No valid Gemini API key found. Running in Smart Mock Mode.")
 
 
 # -------------------------------------------------------------
@@ -252,12 +252,12 @@ def analyze_message_local(msg_input):
 
 
 # -------------------------------------------------------------
-# Claude API Prompt Builders
+# Gemini API Prompt Builders
 # -------------------------------------------------------------
 
-def query_claude_upi(upi_input):
+def query_gemini_upi(upi_input):
     """
-    Sends the UPI ID/Phone number to Claude API for real-time analysis.
+    Sends the UPI ID/Phone number to Gemini API for real-time analysis.
     Fails gracefully to local logic on error.
     """
     prompt = f"""
@@ -290,36 +290,23 @@ def query_claude_upi(upi_input):
     Remember: Respond with ONLY the raw JSON. No markdown backticks, no introduction, no extra text.
     """
     try:
-        # Using exact Claude models or fallbacks
-        model = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")
-        # Fallback handling in case of model mismatches
-        response = client.messages.create(
-            model=model,
-            max_tokens=1000,
-            temperature=0,
-            system="You are an expert cybersecurity scanner that communicates in ultra-simple rural-friendly English and Kannada. You always output raw JSON only.",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+        import google.generativeai as genai
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
         )
-        # Parse output
-        content_text = response.content[0].text.strip()
-        # Clean potential markdown wrapping
-        if content_text.startswith("```json"):
-            content_text = content_text.replace("```json", "", 1).rstrip("`").strip()
-        elif content_text.startswith("```"):
-            content_text = content_text.strip("`").strip()
-            
+        content_text = response.text.strip()
         data = json.loads(content_text)
         return data
     except Exception as e:
-        print(f"Error calling Anthropic API for UPI, falling back: {e}")
+        print(f"Error calling Gemini API for UPI, falling back: {e}")
         return analyze_upi_local(upi_input)
 
 
-def query_claude_message(msg_input):
+def query_gemini_message(msg_input):
     """
-    Sends a WhatsApp message/URL to Claude API for real-time analysis.
+    Sends a WhatsApp message/URL to Gemini API for real-time analysis.
     Fails gracefully to local logic on error.
     """
     prompt = f"""
@@ -342,26 +329,17 @@ def query_claude_message(msg_input):
     Remember: Respond with ONLY the raw JSON. No markdown backticks, no introduction, no extra text.
     """
     try:
-        model = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")
-        response = client.messages.create(
-            model=model,
-            max_tokens=1000,
-            temperature=0,
-            system="You are an expert cyber fraud investigator communicating with rural Indian users in simple English and Kannada. You always output raw JSON only.",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+        import google.generativeai as genai
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
         )
-        content_text = response.content[0].text.strip()
-        if content_text.startswith("```json"):
-            content_text = content_text.replace("```json", "", 1).rstrip("`").strip()
-        elif content_text.startswith("```"):
-            content_text = content_text.strip("`").strip()
-            
+        content_text = response.text.strip()
         data = json.loads(content_text)
         return data
     except Exception as e:
-        print(f"Error calling Anthropic API for Message, falling back: {e}")
+        print(f"Error calling Gemini API for Message, falling back: {e}")
         return analyze_message_local(msg_input)
 
 
@@ -373,7 +351,7 @@ def query_claude_message(msg_input):
 def get_status():
     return jsonify({
         "status": "online",
-        "api_mode": "Claude API (Live)" if HAS_REAL_API else "Smart Mock Mode (Local Fallback)"
+        "api_mode": "Gemini API (Live)" if HAS_REAL_API else "Smart Mock Mode (Local Fallback)"
     })
 
 
@@ -386,7 +364,7 @@ def analyze_upi():
         return jsonify({"error": "UPI ID or Phone number is required"}), 400
         
     if HAS_REAL_API:
-        analysis = query_claude_upi(upi_input)
+        analysis = query_gemini_upi(upi_input)
     else:
         analysis = analyze_upi_local(upi_input)
         
@@ -402,7 +380,7 @@ def analyze_message():
         return jsonify({"error": "Message or link content is required"}), 400
         
     if HAS_REAL_API:
-        analysis = query_claude_message(msg_input)
+        analysis = query_gemini_message(msg_input)
     else:
         analysis = analyze_message_local(msg_input)
         
