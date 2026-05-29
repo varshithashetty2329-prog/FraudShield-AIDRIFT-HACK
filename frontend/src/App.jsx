@@ -1195,9 +1195,89 @@ export default function App() {
     setSimMessage(msg);
   };
 
-  const handlePayRedirect = (app) => {
+  const extractUpiId = (input) => {
+    if (!input) return '';
+    const trimmed = input.trim();
+    if (trimmed.includes('pa=')) {
+      const match = trimmed.match(/[?&]pa=([^&]+)/);
+      if (match) {
+        try {
+          return decodeURIComponent(match[1]).trim();
+        } catch {
+          return match[1].trim();
+        }
+      }
+    }
+    return trimmed;
+  };
+
+  const extractMerchantName = (input) => {
+    if (!input) return 'Merchant';
+    const trimmed = input.trim();
+    if (trimmed.includes('pn=')) {
+      const match = trimmed.match(/[?&]pn=([^&]+)/);
+      if (match) {
+        try {
+          return decodeURIComponent(match[1]).trim();
+        } catch {
+          return match[1].trim();
+        }
+      }
+    }
+    return 'Merchant';
+  };
+
+  const handlePayRedirect = (app, rawInput) => {
+    const upiId = extractUpiId(rawInput);
+    if (!upiId) {
+      alert(lang === 'en' ? "Could not find a valid UPI ID to pay." : "ಪಾವತಿಸಲು ಮಾನ್ಯವಾದ UPI ID ಕಂಡುಬಂದಿಲ್ಲ.");
+      return;
+    }
+
+    const pn = extractMerchantName(rawInput);
+    const literalUpiId = upiId;
+    const encodedPn = encodeURIComponent(pn);
+
     const infoText = activeTranslations.upgrades.payTriggered.replace("[App]", app);
     alert(infoText);
+
+    let deepLinkUrl;
+    let playStoreUrl;
+
+    switch (app) {
+      case 'GPay':
+        deepLinkUrl = `tez://upi/pay?pa=${literalUpiId}&pn=${encodedPn}`;
+        playStoreUrl = 'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user';
+        break;
+      case 'PhonePe':
+        deepLinkUrl = `phonepe://pay?pa=${literalUpiId}`;
+        playStoreUrl = 'https://play.google.com/store/apps/details?id=com.phonepe.app';
+        break;
+      case 'Paytm':
+        deepLinkUrl = `paytmmp://pay?pa=${literalUpiId}`;
+        playStoreUrl = 'https://play.google.com/store/apps/details?id=net.one97.paytm';
+        break;
+      case 'BHIM UPI':
+        deepLinkUrl = `upi://pay?pa=${literalUpiId}`;
+        playStoreUrl = 'https://play.google.com/store/apps/details?id=in.org.npci.upiapp';
+        break;
+      default:
+        return;
+    }
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (!isMobile) {
+      window.open(playStoreUrl, '_blank');
+    } else {
+      const start = Date.now();
+      window.location.href = deepLinkUrl;
+      setTimeout(() => {
+        if (!document.hidden && Date.now() - start < 3000) {
+          window.location.href = playStoreUrl;
+        }
+      }, 2000);
+    }
   };
 
   const getStatusColorClasses = (status) => {
@@ -1378,25 +1458,25 @@ export default function App() {
               {/* Payment brand buttons row */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <button
-                  onClick={() => handlePayRedirect('GPay')}
+                  onClick={() => handlePayRedirect('GPay', rawInput)}
                   className="bg-[#4285F4] hover:bg-[#357ae8] text-white font-black py-3.5 rounded-xl text-base shadow-sm border border-blue-400 transition-all active:scale-95 text-center cursor-pointer"
                 >
                   Pay via GPay
                 </button>
                 <button
-                  onClick={() => handlePayRedirect('PhonePe')}
+                  onClick={() => handlePayRedirect('PhonePe', rawInput)}
                   className="bg-[#5f259f] hover:bg-[#4d1e82] text-white font-black py-3.5 rounded-xl text-base shadow-sm border border-purple-400 transition-all active:scale-95 text-center cursor-pointer"
                 >
                   PhonePe
                 </button>
                 <button
-                  onClick={() => handlePayRedirect('Paytm')}
+                  onClick={() => handlePayRedirect('Paytm', rawInput)}
                   className="bg-[#00baf2] hover:bg-[#009ed1] text-white font-black py-3.5 rounded-xl text-base shadow-sm border border-sky-400 transition-all active:scale-95 text-center cursor-pointer"
                 >
                   Paytm
                 </button>
                 <button
-                  onClick={() => handlePayRedirect('BHIM UPI')}
+                  onClick={() => handlePayRedirect('BHIM UPI', rawInput)}
                   className="bg-[#e47911] hover:bg-[#cc6c0d] text-white font-black py-3.5 rounded-xl text-base shadow-sm border border-orange-400 transition-all active:scale-95 text-center cursor-pointer"
                 >
                   BHIM UPI
